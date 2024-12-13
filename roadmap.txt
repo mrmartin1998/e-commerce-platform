@@ -1,19 +1,19 @@
 E-COMMERCE PLATFORM ROADMAP
 
-1. PROJECT SETUP & PLANNING
-   - Project structure organization
-   - Database schema design
-   - API endpoints planning
-   - UI/UX wireframes
-   - Color scheme and design system
+1. PROJECT SETUP & PLANNING ✅
+   - Project structure organization ✅
+   - Database schema design ✅
+   - API endpoints planning 
+   - UI/UX wireframes 
+   - Color scheme and design system ✅
 
 2. DATABASE & BACKEND SETUP
-   - MongoDB connection setup
-   - Models creation:
-     * User
-     * Product
-     * Order
-     * Cart
+   - MongoDB connection setup ✅
+   - Models creation: ✅
+     * User ✅
+     * Product ✅
+     * Order ✅
+     * Cart ✅
    - Authentication system
    - API Routes structure
 
