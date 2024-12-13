@@ -1,5 +1,6 @@
 import { Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
+import { requireAdmin } from '@/lib/middleware/adminAuth';
 
 export async function GET(request) {
   try {
@@ -37,4 +38,35 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-} 
+}
+
+export const POST = requireAdmin(async function(request) {
+  try {
+    await connectDB();
+    
+    const productData = await request.json();
+    
+    // Basic validation
+    if (!productData.name || !productData.price || !productData.category) {
+      return Response.json(
+        { error: 'Name, price, and category are required' },
+        { status: 400 }
+      );
+    }
+
+    const product = await Product.create({
+      ...productData,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    });
+
+    return Response.json({ product }, { status: 201 });
+
+  } catch (error) {
+    console.error('Product creation error:', error);
+    return Response.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}); 
