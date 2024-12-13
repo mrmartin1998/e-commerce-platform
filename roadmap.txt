@@ -17,6 +17,58 @@ E-COMMERCE PLATFORM ROADMAP
    - Authentication system
    - API Routes structure
 
+E-COMMERCE API ENDPOINTS
+
+1. Authentication (/api/auth/*)
+   - POST /api/auth/register
+   - POST /api/auth/login
+   - POST /api/auth/logout
+   - GET /api/auth/me
+   - PUT /api/auth/password
+
+2. Products (/api/products/*)
+   - GET /api/products
+   - GET /api/products/[id]
+   - GET /api/products/search?q=query
+   - GET /api/products/category/[category]
+   - POST /api/products (admin)
+   - PUT /api/products/[id] (admin)
+   - DELETE /api/products/[id] (admin)
+
+3. Cart (/api/cart/*)
+   - GET /api/cart
+   - POST /api/cart/add
+   - PUT /api/cart/update
+   - DELETE /api/cart/remove
+   - DELETE /api/cart/clear
+
+4. Orders (/api/orders/*)
+   - GET /api/orders
+   - GET /api/orders/[id]
+   - POST /api/orders/create
+   - PUT /api/orders/[id]/status (admin)
+   - GET /api/orders/history
+
+5. User Management (/api/users/*)
+   - GET /api/users/profile
+   - PUT /api/users/profile
+   - GET /api/users/addresses
+   - POST /api/users/addresses
+   - PUT /api/users/addresses/[id]
+   - DELETE /api/users/addresses/[id]
+
+6. Payment (/api/payment/*)
+   - POST /api/payment/create-intent
+   - POST /api/payment/webhook
+   - GET /api/payment/config
+
+7. Admin (/api/admin/*)
+   - GET /api/admin/dashboard
+   - GET /api/admin/orders
+   - GET /api/admin/users
+   - PUT /api/admin/orders/[id]
+   - GET /api/admin/statistics
+
 3. CORE FEATURES IMPLEMENTATION
    Phase 1: Products
    - Product listing page
