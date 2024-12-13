@@ -20,11 +20,11 @@ E-COMMERCE PLATFORM ROADMAP
 E-COMMERCE API ENDPOINTS
 
 1. Authentication (/api/auth/*)
-   - POST /api/auth/register
-   - POST /api/auth/login
-   - POST /api/auth/logout
-   - GET /api/auth/me
-   - PUT /api/auth/password
+   - POST /api/auth/register ✅
+   - POST /api/auth/login ✅
+   - POST /api/auth/logout ✅
+   - GET /api/auth/me ✅
+   - PUT /api/auth/password ✅
 
 2. Products (/api/products/*)
    - GET /api/products
