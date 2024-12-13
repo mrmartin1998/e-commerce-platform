@@ -49,13 +49,13 @@ E-COMMERCE API ENDPOINTS
    - PUT /api/orders/[id]/status (admin) ✅
    - GET /api/orders/history ✅
 
-5. User Management (/api/users/*)
-   - GET /api/users/profile
-   - PUT /api/users/profile
-   - GET /api/users/addresses
-   - POST /api/users/addresses
-   - PUT /api/users/addresses/[id]
-   - DELETE /api/users/addresses/[id]
+5. User Management (/api/users/*) ✅
+   - GET /api/users/profile ✅
+   - PUT /api/users/profile ✅
+   - GET /api/users/addresses ✅
+   - POST /api/users/addresses ✅
+   - PUT /api/users/addresses/[id] ✅
+   - DELETE /api/users/addresses/[id] ✅
 
 6. Payment (/api/payment/*)
    - POST /api/payment/create-intent
