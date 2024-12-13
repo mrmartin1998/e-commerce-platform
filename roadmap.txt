@@ -57,10 +57,10 @@ E-COMMERCE API ENDPOINTS
    - PUT /api/users/addresses/[id] ✅
    - DELETE /api/users/addresses/[id] ✅
 
-6. Payment (/api/payment/*)
-   - POST /api/payment/create-intent
-   - POST /api/payment/webhook
-   - GET /api/payment/config
+6. Payment (/api/payment/*) ✅
+   - POST /api/payment/create-intent ✅
+   - POST /api/payment/webhook ✅
+   - GET /api/payment/config ✅
 
 7. Admin (/api/admin/*)
    - GET /api/admin/dashboard
