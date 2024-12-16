@@ -4,11 +4,13 @@ import { requireAuth } from '@/lib/middleware/auth';
 import { isValidObjectId } from 'mongoose';
 
 // PUT /api/users/addresses/[id]
-export const PUT = requireAuth(async function(request, { params }) {
+export const PUT = requireAuth(async function(req) {
   try {
     await connectDB();
     
-    const { id } = params;
+    // Get ID from URL path
+    const id = req.url.split('/').pop();
+    
     if (!isValidObjectId(id)) {
       return Response.json(
         { error: 'Invalid address ID' },
@@ -16,8 +18,8 @@ export const PUT = requireAuth(async function(request, { params }) {
       );
     }
 
-    const updates = await request.json();
-    const user = await User.findById(request.user._id);
+    const updates = await req.json();
+    const user = await User.findById(req.user._id);
     
     const addressIndex = user.addresses.findIndex(
       addr => addr._id.toString() === id
@@ -33,7 +35,8 @@ export const PUT = requireAuth(async function(request, { params }) {
     // Update address
     user.addresses[addressIndex] = {
       ...user.addresses[addressIndex].toObject(),
-      ...updates
+      ...updates,
+      _id: user.addresses[addressIndex]._id // Preserve the original _id
     };
 
     await user.save();
@@ -49,11 +52,13 @@ export const PUT = requireAuth(async function(request, { params }) {
 });
 
 // DELETE /api/users/addresses/[id]
-export const DELETE = requireAuth(async function(request, { params }) {
+export const DELETE = requireAuth(async function(req) {
   try {
     await connectDB();
     
-    const { id } = params;
+    // Get ID from URL path
+    const id = req.url.split('/').pop();
+    
     if (!isValidObjectId(id)) {
       return Response.json(
         { error: 'Invalid address ID' },
@@ -61,7 +66,7 @@ export const DELETE = requireAuth(async function(request, { params }) {
       );
     }
 
-    const user = await User.findById(request.user._id);
+    const user = await User.findById(req.user._id);
     
     const addressIndex = user.addresses.findIndex(
       addr => addr._id.toString() === id
