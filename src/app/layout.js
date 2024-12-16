@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -17,13 +18,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="dark">
-      <body className={`${geistSans.variable} min-h-screen bg-base-100`}>
+      <body className={`${geistSans.variable} min-h-screen bg-base-100 flex flex-col`}>
         <Suspense fallback={<div>Loading...</div>}>
           <Navbar />
         </Suspense>
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 flex-grow">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
