@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
-// Temporary mock data until we connect to MongoDB
-const mockProducts = [
+// Export the mock data
+export const mockProducts = [
   {
     _id: '1',
     name: 'Product 1',
