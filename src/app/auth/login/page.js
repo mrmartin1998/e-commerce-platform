@@ -33,8 +33,14 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to login');
       }
 
-      // TODO: Store token in Zustand auth store
+      // Store the token in localStorage
+      localStorage.setItem('token', data.token);
+      
+      // Redirect to products page
       router.push('/products');
+      
+      // Force a page refresh to update the navbar
+      window.location.reload();
     } catch (err) {
       setError(err.message);
     } finally {
