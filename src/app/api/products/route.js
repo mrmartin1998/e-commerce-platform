@@ -1,45 +1,63 @@
-import { Product } from '@/lib/models';
-import connectDB from '@/lib/db/mongoose';
-import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { NextResponse } from 'next/server';
 
-export async function GET(request) {
+// Temporary mock data until we connect to MongoDB
+const mockProducts = [
+  {
+    _id: '1',
+    name: 'Product 1',
+    description: 'This is a description for product 1',
+    price: 99.99,
+    image: '/images/placeholder.png'
+  },
+  {
+    _id: '2',
+    name: 'Product 2', 
+    description: 'This is a description for product 2',
+    price: 149.99,
+    image: '/images/placeholder.png'
+  },
+  {
+    _id: '3',
+    name: 'Wireless Headphones',
+    description: 'High-quality wireless headphones with noise cancellation',
+    price: 199.99,
+    image: '/images/placeholder.png'
+  },
+  {
+    _id: '4', 
+    name: 'Smart Watch',
+    description: 'Feature-rich smartwatch with health tracking capabilities',
+    price: 299.99,
+    image: '/images/placeholder.png'
+  },
+  {
+    _id: '5',
+    name: 'Laptop Backpack',
+    description: 'Durable laptop backpack with multiple compartments',
+    price: 79.99,
+    image: '/images/placeholder.png'
+  },
+  {
+    _id: '6',
+    name: 'Coffee Maker',
+    description: 'Programmable coffee maker with thermal carafe',
+    price: 129.99,
+    image: '/images/placeholder.png'
+  }
+];
+
+export async function GET() {
   try {
-    await connectDB();
-    
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page')) || 1;
-    const limit = parseInt(searchParams.get('limit')) || 10;
-    const sort = searchParams.get('sort') || '-createdAt';
-    
-    const skip = (page - 1) * limit;
-    
-    const products = await Product
-      .find({ status: 'published' })
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .select('-ratings');
-
-    const total = await Product.countDocuments({ status: 'published' });
-    
-    return Response.json({
-      products,
-      pagination: {
-        current: page,
-        total: Math.ceil(total / limit),
-        hasMore: skip + products.length < total
-      }
-    });
-
+    // Later we'll fetch from MongoDB
+    return NextResponse.json({ products: mockProducts });
   } catch (error) {
-    console.error('Products fetch error:', error);
-    return Response.json(
-      { error: 'Internal server error' },
+    return NextResponse.json(
+      { error: 'Failed to fetch products' },
       { status: 500 }
     );
   }
 }
-
+/*
 export const POST = requireAdmin(async function(request) {
   try {
     await connectDB();
@@ -69,4 +87,6 @@ export const POST = requireAdmin(async function(request) {
       { status: 500 }
     );
   }
-}); 
+});
+
+*/
