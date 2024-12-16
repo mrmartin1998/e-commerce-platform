@@ -1,29 +1,32 @@
-import { Cart, Product } from '@/lib/models';
-import connectDB from '@/lib/db/mongoose';
+import { NextResponse } from 'next/server';
+import { mockProducts } from '@/app/api/products/route';
 import { requireAuth } from '@/lib/middleware/auth';
 
 // GET /api/cart - Get user's cart
-async function getHandler(request) {
+export const GET = requireAuth(async function(request) {
   try {
-    await connectDB();
-    
-    const cart = await Cart.findOne({ userId: request.user._id })
-      .populate('items.productId', 'name price images');
+    // For testing, return a cart with a mock product
+    const mockCartItem = {
+      productId: mockProducts[0]._id,
+      quantity: 2,
+      price: mockProducts[0].price,
+      name: mockProducts[0].name,
+      image: mockProducts[0].image
+    };
 
-    if (!cart) {
-      return Response.json({ items: [], subtotal: 0 });
-    }
-
-    return Response.json(cart);
+    return NextResponse.json({
+      items: [mockCartItem],
+      subtotal: mockCartItem.price * mockCartItem.quantity
+    });
 
   } catch (error) {
     console.error('Cart fetch error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
-}
+});
 
 // POST /api/cart/add - Add item to cart
 async function postHandler(request) {
@@ -85,5 +88,4 @@ async function postHandler(request) {
   }
 }
 
-export const GET = requireAuth(getHandler);
 export const POST = requireAuth(postHandler); 
