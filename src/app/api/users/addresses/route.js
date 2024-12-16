@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { User } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
