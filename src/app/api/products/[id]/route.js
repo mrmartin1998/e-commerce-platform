@@ -3,7 +3,9 @@ import { mockProducts } from '@/app/api/products/route';
 
 export async function GET(request, { params }) {
   try {
-    const product = mockProducts.find(p => p._id === params.id);
+    const { id } = params;
+    
+    const product = mockProducts.find(p => p._id === String(id));
     
     if (!product) {
       return NextResponse.json(
