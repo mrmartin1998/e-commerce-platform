@@ -5,7 +5,7 @@ export async function GET(request, { params }) {
   try {
     const { id } = params;
     
-    const product = mockProducts.find(p => p._id === String(id));
+    const product = mockProducts.find(p => p._id === id);
     
     if (!product) {
       return NextResponse.json(

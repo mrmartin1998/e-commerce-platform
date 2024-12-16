@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import AddToCartButton from '@/components/products/AddToCartButton';
 
 async function getProduct(id) {
   const res = await fetch(`/api/products/${id}`);
@@ -57,10 +58,8 @@ export default function ProductDetailPage() {
           <div className="divider"></div>
           <p className="text-gray-600">{product.description}</p>
           
-          <div className="flex gap-4 mt-8">
-            <button className="btn btn-primary flex-1">
-              Add to Cart
-            </button>
+          <div className="flex flex-col gap-4 mt-8">
+            <AddToCartButton productId={product._id} />
             <button className="btn btn-outline">
               Add to Wishlist
             </button>
