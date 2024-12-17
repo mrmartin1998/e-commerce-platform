@@ -1,17 +1,14 @@
-import { verifyAuth } from './auth';
+import { NextResponse } from 'next/server';
+import { requireAuth } from './auth';
 
 export function requireAdmin(handler) {
-  return async function (request) {
-    const user = await verifyAuth(request);
-    
-    if (!user || user.role !== 'admin') {
-      return Response.json(
-        { error: 'Admin access required' },
+  return requireAuth(async (request) => {
+    if (!request.user.isAdmin) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
         { status: 403 }
       );
     }
-    
-    request.user = user;
     return handler(request);
-  };
+  });
 } 
