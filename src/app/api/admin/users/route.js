@@ -1,6 +1,7 @@
 import { User } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { NextResponse } from 'next/server';
 
 export const GET = requireAdmin(async function(request) {
   try {
@@ -29,7 +30,7 @@ export const GET = requireAdmin(async function(request) {
       User.countDocuments(query)
     ]);
 
-    return Response.json({
+    return NextResponse.json({
       users,
       pagination: {
         current: page,
@@ -40,7 +41,7 @@ export const GET = requireAdmin(async function(request) {
 
   } catch (error) {
     console.error('Admin users fetch error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

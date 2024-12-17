@@ -1,6 +1,7 @@
 import { Order, User, Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { NextResponse } from 'next/server';
 
 export const GET = requireAdmin(async function(request) {
   try {
@@ -40,7 +41,7 @@ export const GET = requireAdmin(async function(request) {
       ])
     ]);
 
-    return Response.json({
+    return NextResponse.json({
       metrics: {
         totalOrders,
         totalUsers,
@@ -52,7 +53,7 @@ export const GET = requireAdmin(async function(request) {
 
   } catch (error) {
     console.error('Dashboard fetch error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

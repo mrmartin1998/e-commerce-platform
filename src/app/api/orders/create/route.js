@@ -1,6 +1,7 @@
 import { Order, Cart, Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
+import { NextResponse } from 'next/server';
 
 export const POST = requireAuth(async function(request) {
   try {
@@ -11,7 +12,7 @@ export const POST = requireAuth(async function(request) {
     // Get user's cart
     const cart = await Cart.findOne({ userId: request.user._id });
     if (!cart || cart.items.length === 0) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Cart is empty' },
         { status: 400 }
       );
@@ -26,7 +27,7 @@ export const POST = requireAuth(async function(request) {
       });
 
       if (!product) {
-        return Response.json(
+        return NextResponse.json(
           { error: `Product ${item.productId} not available in requested quantity` },
           { status: 400 }
         );
@@ -44,11 +45,11 @@ export const POST = requireAuth(async function(request) {
     // Clear cart
     await Cart.findByIdAndDelete(cart._id);
 
-    return Response.json({ order }, { status: 201 });
+    return NextResponse.json({ order }, { status: 201 });
 
   } catch (error) {
     console.error('Order creation error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

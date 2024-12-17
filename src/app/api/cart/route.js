@@ -43,7 +43,7 @@ async function postHandler(request) {
     });
 
     if (!product) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Product not available' },
         { status: 400 }
       );
@@ -77,11 +77,11 @@ async function postHandler(request) {
 
     await cart.save();
     
-    return Response.json(cart);
+    return NextResponse.json(cart);
 
   } catch (error) {
     console.error('Cart add error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

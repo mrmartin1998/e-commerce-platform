@@ -11,13 +11,17 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
+        const token = localStorage.getItem('token');
+        console.log('Sending token:', token);
+        
         const response = await fetch('/api/admin/dashboard', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${token}`
           }
         });
         
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.error) {
           throw new Error(data.error);

@@ -75,6 +75,9 @@ export default function Navbar() {
             <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
               <li><Link href="/profile">Profile</Link></li>
               <li><Link href="/orders">Orders</Link></li>
+              {user?.isAdmin && (
+                <li><Link href="/admin/products">Manage Products</Link></li>
+              )}
               <li><button onClick={handleLogout}>Logout</button></li>
             </ul>
           </div>

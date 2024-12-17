@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { Product } from '@/lib/models';
+import connectDB from '@/lib/db/mongoose';
+import { requireAdmin } from '@/lib/middleware/adminAuth';
 
 // Export the mock data
 export const mockProducts = [
@@ -57,7 +60,7 @@ export async function GET() {
     );
   }
 }
-/*
+
 export const POST = requireAdmin(async function(request) {
   try {
     await connectDB();
@@ -65,9 +68,9 @@ export const POST = requireAdmin(async function(request) {
     const productData = await request.json();
     
     // Basic validation
-    if (!productData.name || !productData.price || !productData.category) {
-      return Response.json(
-        { error: 'Name, price, and category are required' },
+    if (!productData.name || !productData.price) {
+      return NextResponse.json(
+        { error: 'Name and price are required' },
         { status: 400 }
       );
     }
@@ -78,15 +81,13 @@ export const POST = requireAdmin(async function(request) {
       updatedAt: Date.now()
     });
 
-    return Response.json({ product }, { status: 201 });
+    return NextResponse.json({ product }, { status: 201 });
 
   } catch (error) {
     console.error('Product creation error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
 });
-
-*/
