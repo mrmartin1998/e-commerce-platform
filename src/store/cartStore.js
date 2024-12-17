@@ -1,131 +1,141 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+'use client';
 
-export const useCartStore = create(
-  persist(
-    (set, get) => ({
-      items: [],
-      loading: false,
-      error: null,
+import { createContext, useContext, useReducer, useCallback } from 'react';
 
-      fetchCart: async () => {
-        try {
-          set({ loading: true, error: null });
-          const token = localStorage.getItem('token');
-          if (!token) return;
+const CartContext = createContext(null);
 
-          const res = await fetch('/api/cart', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          const data = await res.json();
-          
-          if (data.error) throw new Error(data.error);
-          set({ items: data.items || [] });
-        } catch (error) {
-          set({ error: error.message });
-        } finally {
-          set({ loading: false });
-        }
-      },
+const initialState = {
+  items: [],
+  loading: false,
+  error: null
+};
 
-      addToCart: async (productId, quantity = 1) => {
-        try {
-          set({ loading: true, error: null });
-          const token = localStorage.getItem('token');
-          if (!token) throw new Error('Please login to add items to cart');
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'SET_ITEMS':
+      return { ...state, items: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    default:
+      return state;
+  }
+}
 
-          const res = await fetch('/api/cart/add', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ productId, quantity })
-          });
-          const data = await res.json();
-          
-          if (data.error) throw new Error(data.error);
-          set({ items: data.items });
-        } catch (error) {
-          set({ error: error.message });
-        } finally {
-          set({ loading: false });
-        }
-      },
+export function CartProvider({ children }) {
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
-      updateQuantity: async (productId, quantity) => {
-        try {
-          set({ loading: true, error: null });
-          const token = localStorage.getItem('token');
-          if (!token) return;
+  const fetchCart = useCallback(async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-          const res = await fetch('/api/cart/update', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ productId, quantity })
-          });
-          const data = await res.json();
-          
-          if (data.error) throw new Error(data.error);
-          set({ items: data.items });
-        } catch (error) {
-          set({ error: error.message });
-        } finally {
-          set({ loading: false });
-        }
-      },
-
-      removeItem: async (productId) => {
-        try {
-          set({ loading: true, error: null });
-          const token = localStorage.getItem('token');
-          if (!token) return;
-
-          const res = await fetch('/api/cart/remove', {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ productId })
-          });
-          const data = await res.json();
-          
-          if (data.error) throw new Error(data.error);
-          set({ items: data.items });
-        } catch (error) {
-          set({ error: error.message });
-        } finally {
-          set({ loading: false });
-        }
-      },
-
-      clearCart: async () => {
-        try {
-          set({ loading: true, error: null });
-          const token = localStorage.getItem('token');
-          if (!token) return;
-
-          const res = await fetch('/api/cart/clear', {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          const data = await res.json();
-          
-          if (data.error) throw new Error(data.error);
-          set({ items: [] });
-        } catch (error) {
-          set({ error: error.message });
-        } finally {
-          set({ loading: false });
-        }
-      }
-    }),
-    {
-      name: 'cart-storage'
+      const res = await fetch('/api/cart', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      
+      if (data.error) throw new Error(data.error);
+      dispatch({ type: 'SET_ITEMS', payload: data.items || [] });
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
-  )
-); 
+  }, []);
+
+  const addToCart = useCallback(async (productId, quantity = 1) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Please login to add items to cart');
+
+      const res = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId, quantity })
+      });
+      const data = await res.json();
+      
+      if (data.error) throw new Error(data.error);
+      dispatch({ type: 'SET_ITEMS', payload: data.items });
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
+  const updateQuantity = useCallback(async (productId, quantity) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/cart/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId, quantity })
+      });
+      const data = await res.json();
+      
+      if (data.error) throw new Error(data.error);
+      dispatch({ type: 'SET_ITEMS', payload: data.items });
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
+  const removeItem = useCallback(async (productId) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const token = localStorage.getItem('token');
+      const res = await fetch('/api/cart/remove', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId })
+      });
+      const data = await res.json();
+      
+      if (data.error) throw new Error(data.error);
+      dispatch({ type: 'SET_ITEMS', payload: data.items });
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, []);
+
+  const value = {
+    ...state,
+    fetchCart,
+    addToCart,
+    updateQuantity,
+    removeItem
+  };
+
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+} 

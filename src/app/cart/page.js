@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/store/cartStore';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function CartPage() {
-  const { items, loading, error, fetchCart, updateQuantity, removeItem } = useCartStore();
+  const { items, loading, error, fetchCart, updateQuantity, removeItem } = useCart();
 
   useEffect(() => {
     fetchCart();
