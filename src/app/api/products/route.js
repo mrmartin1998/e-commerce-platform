@@ -51,9 +51,14 @@ export const mockProducts = [
 
 export async function GET() {
   try {
-    // Later we'll fetch from MongoDB
-    return NextResponse.json({ products: mockProducts });
+    await connectDB();
+    const products = await Product.find({})
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .select('-__v'); // Exclude version field
+    
+    return NextResponse.json({ products });
   } catch (error) {
+    console.error('Products fetch error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch products' },
       { status: 500 }

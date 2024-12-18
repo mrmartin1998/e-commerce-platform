@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server';
-import { mockProducts } from '@/app/api/products/route';
+import { Product, Cart } from '@/lib/models';
+import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
 
 export const PUT = requireAuth(async function(request) {
   try {
+    await connectDB();
     const { productId, quantity } = await request.json();
 
-    // Find product in mock data
-    const product = mockProducts.find(p => p._id === productId);
+    // Validate product
+    const product = await Product.findOne({ 
+      _id: productId,
+      status: 'published',
+      stock: { $gte: quantity }
+    });
 
     if (!product) {
       return NextResponse.json(
@@ -16,16 +22,38 @@ export const PUT = requireAuth(async function(request) {
       );
     }
 
-    // Return mock response with updated quantity
-    return NextResponse.json({
-      items: [{
-        productId,
-        quantity,
-        price: product.price,
-        name: product.name,
-        image: product.image
-      }]
-    });
+    // Update cart
+    const cart = await Cart.findOneAndUpdate(
+      { 
+        userId: request.user._id,
+        'items.productId': productId 
+      },
+      { 
+        $set: { 
+          'items.$.quantity': quantity,
+          'items.$.price': product.price
+        }
+      },
+      { new: true }
+    ).populate('items.productId', 'name image');
+
+    if (!cart) {
+      return NextResponse.json(
+        { error: 'Cart item not found' },
+        { status: 404 }
+      );
+    }
+
+    // Format response
+    const items = cart.items.map(item => ({
+      productId: item.productId._id,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.productId.name,
+      image: item.productId.image
+    }));
+
+    return NextResponse.json({ items });
 
   } catch (error) {
     console.error('Cart update error:', error);

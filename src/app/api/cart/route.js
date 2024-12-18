@@ -1,22 +1,33 @@
 import { NextResponse } from 'next/server';
-import { mockProducts } from '@/app/api/products/route';
+import { Cart, Product } from '@/lib/models';
+import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
 
 // GET /api/cart - Get user's cart
 export const GET = requireAuth(async function(request) {
   try {
-    // For testing, return a cart with a mock product
-    const mockCartItem = {
-      productId: mockProducts[0]._id,
-      quantity: 2,
-      price: mockProducts[0].price,
-      name: mockProducts[0].name,
-      image: mockProducts[0].image
-    };
+    await connectDB();
+    
+    // Get user's cart with populated product details
+    const cart = await Cart.findOne({ userId: request.user._id })
+      .populate('items.productId', 'name image');
+
+    if (!cart) {
+      return NextResponse.json({ items: [], subtotal: 0 });
+    }
+
+    // Format response to match frontend expectations
+    const items = cart.items.map(item => ({
+      productId: item.productId._id,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.productId.name,
+      image: item.productId.image
+    }));
 
     return NextResponse.json({
-      items: [mockCartItem],
-      subtotal: mockCartItem.price * mockCartItem.quantity
+      items,
+      subtotal: cart.subtotal
     });
 
   } catch (error) {

@@ -1,10 +1,10 @@
 "use client";
 
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/store/cartStore';
 import { useState } from 'react';
 
 export default function AddToCartButton({ productId }) {
-  const { addToCart, loading, error } = useCartStore();
+  const { addToCart, loading, error } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = async () => {

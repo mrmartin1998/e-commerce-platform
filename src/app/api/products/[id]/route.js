@@ -1,11 +1,41 @@
 import { NextResponse } from 'next/server';
-import { mockProducts } from '@/app/api/products/route';
+import { Product } from '@/lib/models';
+import connectDB from '@/lib/db/mongoose';
+import { requireAdmin } from '@/lib/middleware/adminAuth';
 
-export async function GET(request, { params }) {
+export const DELETE = requireAdmin(async function(request, context) {
   try {
+    await connectDB();
+    const params = await context.params;
     const { id } = params;
     
-    const product = mockProducts.find(p => p._id === id);
+    const product = await Product.findByIdAndDelete(id);
+    
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+    
+  } catch (error) {
+    console.error('Product deletion error:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete product' },
+      { status: 500 }
+    );
+  }
+});
+
+export const GET = async function(request, context) {
+  try {
+    await connectDB();
+    const params = await context.params;
+    const { id } = params;
+    
+    const product = await Product.findById(id);
     
     if (!product) {
       return NextResponse.json(
@@ -15,10 +45,43 @@ export async function GET(request, { params }) {
     }
 
     return NextResponse.json({ product });
+    
   } catch (error) {
+    console.error('Product fetch error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch product' },
       { status: 500 }
     );
   }
-}
+};
+
+export const PATCH = requireAdmin(async function(request, context) {
+  try {
+    await connectDB();
+    const params = await context.params;
+    const { id } = params;
+    const updates = await request.json();
+    
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { ...updates, updatedAt: Date.now() },
+      { new: true, runValidators: true }
+    );
+    
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ product });
+    
+  } catch (error) {
+    console.error('Product update error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update product' },
+      { status: 500 }
+    );
+  }
+});

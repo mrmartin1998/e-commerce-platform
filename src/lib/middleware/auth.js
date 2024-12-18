@@ -37,7 +37,7 @@ export async function verifyAuth(request) {
 }
 
 export function requireAuth(handler) {
-  return async function (request) {
+  return async function (request, context) {
     const user = await verifyAuth(request);
     
     if (!user) {
@@ -48,6 +48,6 @@ export function requireAuth(handler) {
     }
     
     request.user = user;
-    return handler(request);
+    return handler(request, context);
   };
 } 

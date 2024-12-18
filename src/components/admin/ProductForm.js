@@ -3,18 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function ProductForm() {
+export default function ProductForm({ initialData, isEditing }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    stock: '',
-    images: [],
-    status: 'draft' // draft or published
+    name: initialData?.name || '',
+    description: initialData?.description || '',
+    price: initialData?.price || '',
+    category: initialData?.category || '',
+    stock: initialData?.stock || '',
+    images: initialData?.images || [],
+    status: initialData?.status || 'draft'
   });
 
   const handleSubmit = async (e) => {
@@ -24,8 +24,12 @@ export default function ProductForm() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const url = isEditing 
+        ? `/api/products/${initialData._id}`
+        : '/api/products';
+      
+      const res = await fetch(url, {
+        method: isEditing ? 'PATCH' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -36,7 +40,7 @@ export default function ProductForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to create product');
+        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'create'} product`);
       }
 
       router.push('/admin/products');
@@ -50,7 +54,9 @@ export default function ProductForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto p-6">
-      <h2 className="text-2xl font-bold">Add New Product</h2>
+      <h2 className="text-2xl font-bold">
+        {isEditing ? 'Edit Product' : 'Add New Product'}
+      </h2>
       
       {error && (
         <div className="alert alert-error">
@@ -140,7 +146,7 @@ export default function ProductForm() {
           className={`btn btn-primary ${loading ? 'loading' : ''}`}
           disabled={loading}
         >
-          Create Product
+          {isEditing ? 'Update Product' : 'Create Product'}
         </button>
       </div>
     </form>

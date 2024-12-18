@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from './auth';
 
 export function requireAdmin(handler) {
-  return requireAuth(async (request) => {
+  return requireAuth(async (request, context) => {
     console.log('Checking admin status:', request.user);
     
     if (!request.user.isAdmin && request.user.role !== 'admin') {
@@ -11,6 +11,6 @@ export function requireAdmin(handler) {
         { status: 403 }
       );
     }
-    return handler(request);
+    return handler(request, context);
   });
 } 

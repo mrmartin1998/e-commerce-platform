@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+function formatPrice(price) {
+  return typeof price === 'number' ? price.toFixed(2) : '0.00';
+}
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +105,7 @@ export default function AdminProductsPage() {
                   </div>
                 </td>
                 <td>{product.name}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>${formatPrice(product.price)}</td>
                 <td>{product.stock || 'N/A'}</td>
                 <td>
                   <span className={`badge ${
