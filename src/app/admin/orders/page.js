@@ -1,24 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, statusFilter]);
+  }, [statusFilter]);
 
   async function fetchOrders() {
     try {
       const params = new URLSearchParams({
-        page: currentPage.toString(),
+        page: '1',
         limit: '10'
       });
       
@@ -39,7 +38,6 @@ export default function AdminOrdersPage() {
       }
       
       setOrders(data.orders);
-      setPagination(data.pagination);
     } catch (err) {
       console.error('Orders fetch error:', err);
       setError('Failed to load orders');
@@ -59,15 +57,39 @@ export default function AdminOrdersPage() {
         body: JSON.stringify({ status: newStatus })
       });
 
-      if (!response.ok) throw new Error('Failed to update order status');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update order status');
+      }
       
-      // Update order in local state
+      const updatedOrder = await response.json();
       setOrders(orders.map(order => 
-        order._id === orderId ? { ...order, status: newStatus } : order
+        order._id === orderId ? updatedOrder : order
       ));
     } catch (err) {
       console.error('Status update error:', err);
-      alert('Failed to update order status');
+      alert(err.message);
+    }
+  }
+
+  async function viewOrderDetails(orderId) {
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch order details');
+      }
+
+      const order = await response.json();
+      setSelectedOrder(order);
+    } catch (err) {
+      console.error('Fetch order details error:', err);
+      alert(err.message);
     }
   }
 
@@ -103,29 +125,28 @@ export default function AdminOrdersPage() {
 
       {/* Orders Table */}
       <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table w-full">
           <thead>
             <tr>
               <th>Order ID</th>
               <th>Customer</th>
-              <th>Items</th>
+              <th>Date</th>
               <th>Total</th>
               <th>Status</th>
-              <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {orders.map(order => (
               <tr key={order._id}>
                 <td>{order._id}</td>
-                <td>{order.userId?.name}</td>
-                <td>{order.items?.length} items</td>
-                <td>${order.total?.toFixed(2)}</td>
+                <td>{order.userId?.email || 'N/A'}</td>
+                <td>{new Date(order.paidAt || order.createdAt).toLocaleDateString()}</td>
+                <td>${order.total?.toFixed(2) || '0.00'}</td>
                 <td>
-                  <select 
+                  <select
                     className="select select-bordered select-sm"
-                    value={order.status}
+                    value={order.status || 'pending'}
                     onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
                   >
                     <option value="pending">Pending</option>
@@ -135,14 +156,13 @@ export default function AdminOrdersPage() {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <Link 
-                    href={`/admin/orders/${order._id}`}
-                    className="btn btn-sm btn-outline"
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => viewOrderDetails(order._id)}
                   >
-                    Details
-                  </Link>
+                    View Details
+                  </button>
                 </td>
               </tr>
             ))}
@@ -150,28 +170,11 @@ export default function AdminOrdersPage() {
         </table>
       </div>
 
-      {/* Pagination */}
-      {pagination && (
-        <div className="flex justify-center gap-2 mt-6">
-          <button
-            className="btn btn-sm"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(p => p - 1)}
-          >
-            Previous
-          </button>
-          <span className="flex items-center">
-            Page {currentPage} of {pagination.total}
-          </span>
-          <button
-            className="btn btn-sm"
-            disabled={!pagination.hasMore}
-            onClick={() => setCurrentPage(p => p + 1)}
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <OrderDetailsModal
+        order={selectedOrder}
+        isOpen={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+      />
     </div>
   );
 }
