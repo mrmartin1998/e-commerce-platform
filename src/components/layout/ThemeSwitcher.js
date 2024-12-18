@@ -11,8 +11,8 @@ export default function ThemeSwitcher() {
         localStorage.setItem('theme', theme);
       }}
     >
-      <option value="light">Light</option>
       <option value="dark">Dark</option>
+      <option value="light">Light</option>
       <option value="cupcake">Cupcake</option>
       <option value="forest">Forest</option>
     </select>
