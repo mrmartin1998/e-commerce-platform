@@ -49,10 +49,7 @@ export default function RegisterPage() {
       localStorage.setItem('token', data.token);
       
       // Redirect to products page
-      router.push('/products');
-      
-      // Force a page refresh to update the navbar
-      window.location.reload();
+      window.location.href = '/products';
     } catch (err) {
       setError(err.message);
     } finally {
