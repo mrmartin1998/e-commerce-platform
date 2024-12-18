@@ -1,14 +1,21 @@
 "use client";
 
 import { useCart } from '@/store/cartStore';
+import { useToast } from '@/components/ui/Toast';
 import { useState } from 'react';
 
 export default function AddToCartButton({ productId }) {
-  const { addToCart, loading, error } = useCart();
+  const { addToCart, loading } = useCart();
+  const { showToast } = useToast();
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = async () => {
-    await addToCart(productId, quantity);
+    try {
+      await addToCart(productId, quantity);
+      showToast('Added to cart!', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
   };
 
   return (
@@ -41,7 +48,6 @@ export default function AddToCartButton({ productId }) {
       >
         Add to Cart
       </button>
-      {error && <p className="text-error text-sm">{error}</p>}
     </div>
   );
 } 

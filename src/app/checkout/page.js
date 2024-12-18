@@ -5,12 +5,14 @@ import { useCart } from '@/store/cartStore';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useToast } from '@/components/ui/Toast';
 
 export default function CheckoutPage() {
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (!items?.length) {
@@ -62,6 +64,28 @@ export default function CheckoutPage() {
       console.error('Checkout error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOrder = async () => {
+    try {
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ shippingAddress })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      clearCart(); // Clear cart state
+      showToast('Order placed successfully!', 'success');
+      router.push('/orders'); // Redirect to orders page
+    } catch (error) {
+      showToast(error.message, 'error');
     }
   };
 

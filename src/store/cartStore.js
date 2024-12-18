@@ -18,6 +18,8 @@ function cartReducer(state, action) {
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'CLEAR_CART':
+      return { ...state, items: [] };
     default:
       return state;
   }
@@ -117,12 +119,17 @@ export function CartProvider({ children }) {
     }
   }, []);
 
+  const clearCart = useCallback(() => {
+    dispatch({ type: 'CLEAR_CART' });
+  }, []);
+
   const value = {
     ...state,
     fetchCart,
     addToCart,
     updateQuantity,
-    removeItem
+    removeItem,
+    clearCart
   };
 
   return (
