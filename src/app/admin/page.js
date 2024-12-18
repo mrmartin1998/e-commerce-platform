@@ -97,6 +97,9 @@ export default function AdminDashboard() {
         <Link href="/admin/orders" className="btn btn-outline">
           View All Orders
         </Link>
+        <Link href="/admin/products" className="btn btn-outline">
+          View All Products
+        </Link>
       </div>
 
       {/* Recent Orders */}
