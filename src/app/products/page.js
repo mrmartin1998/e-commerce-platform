@@ -5,8 +5,11 @@ import ProductCard from '@/components/products/ProductCard';
 import ProductListItem from '@/components/products/ProductListItem';
 
 async function getProducts() {
-  const res = await fetch(`http://localhost:3000/api/products`, {
-    cache: 'no-store'
+  const res = await fetch('/api/products', {
+    cache: 'no-store',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token') || ''}`
+    }
   });
   if (!res.ok) throw new Error('Failed to fetch products');
   return res.json();
