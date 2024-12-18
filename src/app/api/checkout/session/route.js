@@ -10,12 +10,13 @@ export const POST = requireAuth(async function(request) {
 
     // Create line items for Stripe
     const lineItems = items.map(item => {
-      // Create a product object without images if the image URL is relative
       const productData = {
         name: item.name,
+        metadata: {
+          productId: item.productId
+        }
       };
 
-      // Only add images if we have a valid absolute URL
       if (item.image && (item.image.startsWith('http://') || item.image.startsWith('https://'))) {
         productData.images = [item.image];
       }
@@ -24,7 +25,7 @@ export const POST = requireAuth(async function(request) {
         price_data: {
           currency: 'usd',
           product_data: productData,
-          unit_amount: Math.round(item.price * 100), // Convert to cents
+          unit_amount: Math.round(item.price * 100),
         },
         quantity: item.quantity,
       };
@@ -53,6 +54,7 @@ export const POST = requireAuth(async function(request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
       metadata: {
         userId: request.user._id.toString(),
+        productIds: JSON.stringify(items.map(item => item.productId))
       },
     });
 

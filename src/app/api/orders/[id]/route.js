@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { Order } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
@@ -9,7 +10,7 @@ export const GET = requireAuth(async function(request, { params }) {
     
     const { id } = params;
     if (!isValidObjectId(id)) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Invalid order ID' },
         { status: 400 }
       );
@@ -23,17 +24,17 @@ export const GET = requireAuth(async function(request, { params }) {
       .populate('items.productId', 'name images price');
 
     if (!order) {
-      return Response.json(
+      return NextResponse.json(
         { error: 'Order not found' },
         { status: 404 }
       );
     }
 
-    return Response.json({ order });
+    return NextResponse.json({ order });
 
   } catch (error) {
     console.error('Order fetch error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );

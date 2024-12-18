@@ -8,21 +8,25 @@ export const GET = requireAuth(async function(request) {
   try {
     await connectDB();
     
-    // Get user's cart with populated product details
+    // Find cart and populate product details
     const cart = await Cart.findOne({ userId: request.user._id })
-      .populate('items.productId', 'name image');
+      .populate('items.productId', 'name images price');
 
     if (!cart) {
-      return NextResponse.json({ items: [], subtotal: 0 });
+      // If no cart exists, return empty cart instead of error
+      return NextResponse.json({
+        items: [],
+        subtotal: 0
+      });
     }
 
     // Format response to match frontend expectations
     const items = cart.items.map(item => ({
-      productId: item.productId._id,
+      productId: item.productId?._id || item.productId,
       quantity: item.quantity,
       price: item.price,
-      name: item.productId.name,
-      image: item.productId.image
+      name: item.productId?.name || 'Product Not Found',
+      image: item.productId?.images?.[0] || null
     }));
 
     return NextResponse.json({
@@ -33,7 +37,7 @@ export const GET = requireAuth(async function(request) {
   } catch (error) {
     console.error('Cart fetch error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch cart' },
       { status: 500 }
     );
   }
