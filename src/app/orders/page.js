@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,6 +53,91 @@ export default function OrdersPage() {
       setLoading(false);
     }
   }
+
+  async function viewOrderDetails(orderId) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch order details');
+      }
+
+      const data = await response.json();
+      setSelectedOrder(data.order);
+    } catch (err) {
+      console.error('Fetch order details error:', err);
+      alert(err.message);
+    }
+  }
+
+  const OrderDetailsModal = () => {
+    if (!selectedOrder) return null;
+    
+    return (
+      <dialog className="modal modal-open">
+        <div className="modal-box max-w-3xl">
+          <h3 className="font-bold text-lg mb-4">
+            Order Details #{selectedOrder._id}
+          </h3>
+          
+          <div className="space-y-4">
+            {selectedOrder.items.map((item) => (
+              <div key={item._id} className="flex gap-4 items-center">
+                <Image
+                  src={item.productId.images[0]}
+                  alt={item.productId.name}
+                  width={80}
+                  height={80}
+                  className="rounded-lg object-cover"
+                />
+                <div className="flex-1">
+                  <h3 className="font-semibold">{item.productId.name}</h3>
+                  <p className="text-sm opacity-70">Quantity: {item.quantity}</p>
+                </div>
+                <p className="font-semibold">${item.price.toFixed(2)}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="divider"></div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>${selectedOrder.subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Tax</span>
+              <span>${selectedOrder.tax.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Shipping</span>
+              <span>${selectedOrder.shipping.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total</span>
+              <span>${selectedOrder.total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div className="modal-action">
+            <button 
+              className="btn" 
+              onClick={() => setSelectedOrder(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </dialog>
+    );
+  };
 
   if (loading) {
     return <div className="flex justify-center p-8">
@@ -103,12 +190,12 @@ export default function OrdersPage() {
                   </td>
                   <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <Link 
-                      href={`/orders/${order._id}`}
+                    <button 
+                      onClick={() => viewOrderDetails(order._id)}
                       className="btn btn-sm btn-outline"
                     >
                       View Details
-                    </Link>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -138,6 +225,8 @@ export default function OrdersPage() {
           </button>
         </div>
       )}
+
+      <OrderDetailsModal />
     </div>
   );
 }

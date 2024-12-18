@@ -67,13 +67,19 @@ export default function OrderDetails({ params }) {
           <div className="space-y-4">
             {order.items.map((item) => (
               <div key={item._id} className="flex gap-4 items-center">
-                <Image
-                  src={item.productId.images[0]}
-                  alt={item.productId.name}
-                  width={80}
-                  height={80}
-                  className="rounded-lg object-cover"
-                />
+                {item.productId.images?.[0] ? (
+                  <Image
+                    src={item.productId.images[0]}
+                    alt={item.productId.name}
+                    width={80}
+                    height={80}
+                    className="rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-base-300 rounded-lg flex items-center justify-center">
+                    <span className="text-sm opacity-50">No image</span>
+                  </div>
+                )}
                 <div className="flex-1">
                   <h3 className="font-semibold">{item.productId.name}</h3>
                   <p className="text-sm opacity-70">Quantity: {item.quantity}</p>

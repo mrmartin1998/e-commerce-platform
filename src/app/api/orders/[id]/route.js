@@ -8,7 +8,7 @@ export const GET = requireAuth(async function(request, { params }) {
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } = await params;
     if (!isValidObjectId(id)) {
       return NextResponse.json(
         { error: 'Invalid order ID' },
