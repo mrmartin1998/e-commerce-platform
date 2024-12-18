@@ -2,42 +2,62 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
-    async function fetchDashboardData() {
-      try {
-        const token = localStorage.getItem('token');
-        console.log('Sending token:', token);
-        
-        const response = await fetch('/api/admin/dashboard', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        const data = await response.json();
-        console.log('Response data:', data);
-        
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        
-        setDashboardData(data);
-      } catch (err) {
-        console.error('Dashboard fetch error:', err);
-        setError('Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchDashboardData();
   }, []);
+
+  async function fetchDashboardData() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/admin/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      setDashboardData(data);
+    } catch (err) {
+      console.error('Dashboard fetch error:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function viewOrderDetails(orderId) {
+    try {
+      const response = await fetch(`/api/admin/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch order details');
+      }
+
+      const order = await response.json();
+      setSelectedOrder(order);
+    } catch (err) {
+      console.error('Fetch order details error:', err);
+      alert(err.message);
+    }
+  }
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">
@@ -107,9 +127,12 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td>
-                    <Link href={`/admin/orders/${order._id}`} className="btn btn-sm">
+                    <button 
+                      onClick={() => viewOrderDetails(order._id)}
+                      className="btn btn-sm"
+                    >
                       View
-                    </Link>
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -117,6 +140,13 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Add the OrderDetailsModal */}
+      <OrderDetailsModal
+        order={selectedOrder}
+        isOpen={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+      />
     </div>
   );
 }
