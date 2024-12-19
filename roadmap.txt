@@ -1,32 +1,141 @@
-[NEW] IMMEDIATE FIXES
-1. Easy Fixes
-   - Admin Dashboard ✓
-     * Add "View All Products" button ✓
-     * TEST: Navigation to products list ✓
-   - Product Visibility ✓
-     * Filter out draft products from main listing ✓
-     * TEST: Only published products shown ✓
-   - Shopping Experience ✓
-     * Add to cart success feedback ✓
-     * Clear cart after successful order ✓
-     * TEST: User feedback works ✓
-     * TEST: Cart state resets properly ✓
+E-COMMERCE PLATFORM ROADMAP
 
-2. Medium Complexity ✓
-   - Authentication Flow ✓
-     * Fix login/register redirect to products ✓
-     * TEST: Proper navigation after auth ✓
-   - Order Management ✓
-     * Add user order details modal ✓
-     * TEST: Order details display correctly ✓
-   - Checkout Process ✓
-     * Enforce address requirement ✓
-     * TEST: Address validation works ✓
+1. RECENTLY VIEWED FEATURE (Easiest to implement)
+   Prerequisites:
+   - Add new schema for user viewing history
+   - Update product view endpoints
+   
+   Steps:
+   1.1. Create RecentlyViewed model
+   1.2. Add tracking to product view routes
+   1.3. Implement cleanup for old entries
+   1.4. Create API endpoint for fetching history
+   1.5. Add UI components for displaying recent items
+   
+   Affected files:
+   - models/
+   - api/products/[id]/
+   - components/product/
 
-3. Complex Features ✓
-   - Inventory Management ✓
-     * Implement stock update system ✓
-     * Add stock validation before checkout ✓
-     * Handle concurrent order stock updates ✓
-     * TEST: Stock updates correctly ✓
-     * TEST: Out of stock handling ✓
+2. WISHLIST FUNCTIONALITY
+   Prerequisites:
+   - Add wishlist schema
+   - Create wishlist management endpoints
+   
+   Steps:
+   2.1. Create Wishlist model
+   2.2. Implement CRUD operations for wishlist
+   2.3. Add wishlist button to product cards
+   2.4. Create wishlist page
+   2.5. Add wishlist count to header
+   
+   Affected files:
+   - models/
+   - api/wishlist/
+   - components/product/
+   - components/header/
+
+3. ORDER TRACKING
+   Prerequisites:
+   - Enhance Order model with status tracking
+   - Add status update endpoints
+   
+   Steps:
+   3.1. Update Order model with tracking states
+   3.2. Create order status update API
+   3.3. Add order tracking page
+   3.4. Implement status timeline component
+   3.5. Add order status filters in admin
+   
+   Affected files:
+   - models/Order.js
+   - api/orders/
+   - admin/orders/
+
+4. PRODUCT REVIEWS & RATINGS
+   Prerequisites:
+   - Add review schema
+   - Update product schema
+   
+   Steps:
+   4.1. Create Review model
+   4.2. Add review submission endpoint
+   4.3. Implement rating aggregation
+   4.4. Create review components
+   4.5. Add review moderation for admin
+   
+   Affected files:
+   - models/
+   - api/products/
+   - api/reviews/
+   - components/product/
+
+5. PRODUCT SEARCH WITH FILTERS
+   Prerequisites:
+   - Implement search indexing
+   - Add filter metadata to products
+   
+   Steps:
+   5.1. Set up MongoDB text indexes
+   5.2. Create filter aggregation pipeline
+   5.3. Implement search API with filters
+   5.4. Add filter UI components
+   5.5. Implement client-side filter state
+   
+   New Dependencies:
+   - Consider MongoDB Atlas Search
+
+6. ADMIN ANALYTICS & REPORTING
+   Prerequisites:
+   - Set up data aggregation
+   - Create reporting endpoints
+   
+   Steps:
+   6.1. Implement data aggregation for:
+        - Sales metrics
+        - Product performance
+        - Customer insights
+   6.2. Create analytics dashboard
+   6.3. Add export functionality
+   6.4. Implement charts and graphs
+   
+   New Dependencies:
+   - Chart library
+   - CSV/Excel export library
+
+7. INVENTORY MANAGEMENT
+   Prerequisites:
+   - Enhance product model
+   - Add inventory tracking
+   
+   Steps:
+   7.1. Add inventory alerts system
+   7.2. Implement bulk product operations
+   7.3. Create inventory dashboard
+   7.4. Add stock level notifications
+   7.5. Implement inventory history
+   
+   Affected files:
+   - models/Product.js
+   - api/admin/inventory/
+   - admin/products/
+
+DEPENDENCIES TO ADD:
+- chart.js or @nivo/core
+- xlsx or csv-parse
+- MongoDB Atlas Search (optional)
+
+INFRASTRUCTURE UPDATES:
+1. Database indexes for:
+   - Product search
+   - Order tracking
+   - Analytics queries
+
+2. Caching layer for:
+   - Product filters
+   - Analytics data
+   - Recently viewed
+
+3. Background jobs for:
+   - Analytics processing
+   - Inventory alerts
