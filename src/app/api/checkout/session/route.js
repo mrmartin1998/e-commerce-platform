@@ -1,12 +1,39 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import Stripe from 'stripe';
+import { Product } from '@/lib/models';
+import connectDB from '@/lib/db/mongoose';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const POST = requireAuth(async function(request) {
   try {
+    await connectDB();
     const { items, shipping, shippingAddress } = await request.json();
+
+    // Validate stock for all items
+    const stockValidation = await Promise.all(
+      items.map(async (item) => {
+        const product = await Product.findOne({
+          _id: item.productId,
+          status: 'published',
+          stock: { $gte: item.quantity }
+        });
+        return { product, requestedQty: item.quantity };
+      })
+    );
+
+    // Check if any products are out of stock
+    const outOfStock = stockValidation.find(
+      ({ product, requestedQty }) => !product || product.stock < requestedQty
+    );
+
+    if (outOfStock) {
+      return NextResponse.json(
+        { error: 'Some items are out of stock' },
+        { status: 400 }
+      );
+    }
 
     if (!shippingAddress) {
       return NextResponse.json(

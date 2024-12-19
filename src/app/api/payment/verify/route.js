@@ -1,8 +1,9 @@
-import { Order } from '@/lib/models';
+import { Order, Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import mongoose from 'mongoose';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -24,12 +25,6 @@ export const GET = requireAuth(async function getHandler(request) {
       expand: ['line_items']
     });
 
-    console.log('Session:', JSON.stringify({
-      id: session.id,
-      metadata: session.metadata,
-      line_items: session.line_items.data
-    }, null, 2));
-
     // Get product IDs from metadata
     const productIds = JSON.parse(session.metadata.productIds || '[]');
     if (!productIds.length || productIds.some(id => !id)) {
@@ -44,7 +39,6 @@ export const GET = requireAuth(async function getHandler(request) {
     const orderItems = session.line_items.data
       .filter(item => !item.description?.toLowerCase().includes('shipping'))
       .map((item, index) => {
-        // Get productId from the metadata array instead of line item
         const productId = productIds[index];
         if (!productId) {
           throw new Error(`Missing product ID for item ${index}`);
@@ -57,7 +51,6 @@ export const GET = requireAuth(async function getHandler(request) {
         };
       });
 
-    // Validate we have items
     if (!orderItems.length) {
       return NextResponse.json(
         { error: 'No valid items found in checkout session' },
@@ -65,18 +58,61 @@ export const GET = requireAuth(async function getHandler(request) {
       );
     }
 
-    const order = await Order.create({
-      userId: request.user._id,
-      items: orderItems,
-      subtotal: session.amount_subtotal / 100,
-      tax: (session.amount_total - session.amount_subtotal) / 100,
-      total: session.amount_total / 100,
-      paymentStatus: session.payment_status,
-      paymentIntentId: session.payment_intent,
-      paidAt: new Date()
-    });
+    // Start a MongoDB transaction
+    const mongoSession = await mongoose.startSession();
+    mongoSession.startTransaction();
 
-    return NextResponse.json(order);
+    try {
+      // Update product stock and create order atomically
+      await Promise.all(
+        orderItems.map(async (item) => {
+          const result = await Product.findOneAndUpdate(
+            {
+              _id: item.productId,
+              stock: { $gte: item.quantity }
+            },
+            {
+              $inc: { stock: -item.quantity },
+              $set: {
+                status: await Product.findOne({ _id: item.productId }).then(product => 
+                  (product.stock - item.quantity) <= 0 ? 'outOfStock' : 'published'
+                )
+              }
+            },
+            { session: mongoSession, new: true }
+          );
+
+          if (!result) {
+            throw new Error(`Failed to update stock for product ${item.productId}`);
+          }
+        })
+      );
+
+      // Create order
+      const order = await Order.create([{
+        userId: request.user._id,
+        items: orderItems,
+        subtotal: session.amount_subtotal / 100,
+        tax: (session.amount_total - session.amount_subtotal) / 100,
+        total: session.amount_total / 100,
+        paymentStatus: session.payment_status,
+        paymentIntentId: session.payment_intent,
+        shippingAddress: JSON.parse(session.metadata.shippingAddress),
+        paidAt: new Date()
+      }], { session: mongoSession });
+
+      // Commit transaction
+      await mongoSession.commitTransaction();
+      return NextResponse.json(order[0]);
+
+    } catch (error) {
+      // If anything fails, rollback the transaction
+      await mongoSession.abortTransaction();
+      throw error;
+    } finally {
+      mongoSession.endSession();
+    }
+
   } catch (error) {
     console.error('Payment verification error:', error);
     return NextResponse.json(
