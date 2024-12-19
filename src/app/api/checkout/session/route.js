@@ -6,30 +6,29 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const POST = requireAuth(async function(request) {
   try {
-    const { items, shipping } = await request.json();
+    const { items, shipping, shippingAddress } = await request.json();
+
+    if (!shippingAddress) {
+      return NextResponse.json(
+        { error: 'Shipping address is required' },
+        { status: 400 }
+      );
+    }
 
     // Create line items for Stripe
-    const lineItems = items.map(item => {
-      const productData = {
-        name: item.name,
-        metadata: {
-          productId: item.productId
-        }
-      };
-
-      if (item.image && (item.image.startsWith('http://') || item.image.startsWith('https://'))) {
-        productData.images = [item.image];
-      }
-
-      return {
-        price_data: {
-          currency: 'usd',
-          product_data: productData,
-          unit_amount: Math.round(item.price * 100),
+    const lineItems = items.map(item => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          metadata: {
+            productId: item.productId
+          }
         },
-        quantity: item.quantity,
-      };
-    });
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity,
+    }));
 
     // Add shipping as a line item
     if (shipping) {
@@ -54,7 +53,8 @@ export const POST = requireAuth(async function(request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart`,
       metadata: {
         userId: request.user._id.toString(),
-        productIds: JSON.stringify(items.map(item => item.productId))
+        productIds: JSON.stringify(items.map(item => item.productId)),
+        shippingAddress: JSON.stringify(shippingAddress)
       },
     });
 

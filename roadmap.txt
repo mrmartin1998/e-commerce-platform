@@ -19,9 +19,9 @@
    - Order Management ✓
      * Add user order details modal ✓
      * TEST: Order details display correctly ✓
-   - Checkout Process
-     * Enforce address requirement 
-     * TEST: Address validation works
+   - Checkout Process ✓
+     * Enforce address requirement ✓
+     * TEST: Address validation works ✓
 
 3. Complex Features
    - Inventory Management

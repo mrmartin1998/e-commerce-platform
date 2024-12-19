@@ -1,4 +1,4 @@
-import { Order, Cart, Product } from '@/lib/models';
+import { Order, Cart } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
 import { NextResponse } from 'next/server';
@@ -9,6 +9,14 @@ export const POST = requireAuth(async function(request) {
     
     const { shippingAddress } = await request.json();
     
+    // Validate shipping address
+    if (!shippingAddress || !shippingAddress.street || !shippingAddress.city || !shippingAddress.country) {
+      return NextResponse.json(
+        { error: 'Invalid shipping address' },
+        { status: 400 }
+      );
+    }
+
     // Get user's cart
     const cart = await Cart.findOne({ userId: request.user._id });
     if (!cart || cart.items.length === 0) {
@@ -18,31 +26,18 @@ export const POST = requireAuth(async function(request) {
       );
     }
 
-    // Verify all products are available
-    for (const item of cart.items) {
-      const product = await Product.findOne({
-        _id: item.productId,
-        status: 'published',
-        stock: { $gte: item.quantity }
-      });
-
-      if (!product) {
-        return NextResponse.json(
-          { error: `Product ${item.productId} not available in requested quantity` },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Create order
+    // Create order with shipping address
     const order = await Order.create({
       userId: request.user._id,
       items: cart.items,
       shippingAddress,
-      subtotal: cart.subtotal
+      subtotal: cart.subtotal,
+      shipping: 10, // Fixed shipping cost
+      total: cart.subtotal + 10,
+      status: 'pending'
     });
 
-    // Clear cart
+    // Clear cart after order creation
     await Cart.findByIdAndDelete(cart._id);
 
     return NextResponse.json({ order }, { status: 201 });
