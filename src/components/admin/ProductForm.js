@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function ProductForm({ initialData, isEditing }) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function ProductForm({ initialData, isEditing }) {
     images: initialData?.images || [],
     status: initialData?.status || 'draft'
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +52,45 @@ export default function ProductForm({ initialData, isEditing }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/products/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, { url: data.url, alt: file.name }]
+      }));
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
   };
 
   return (
@@ -130,6 +171,42 @@ export default function ProductForm({ initialData, isEditing }) {
             <option value="draft">Draft</option>
             <option value="published">Published</option>
           </select>
+        </div>
+
+        <div className="form-control md:col-span-2">
+          <label className="label">Product Images</label>
+          <div className="flex flex-wrap gap-4 mb-4">
+            {formData.images.map((image, index) => (
+              <div key={index} className="relative w-32 h-32">
+                <Image
+                  src={image.url}
+                  alt={image.alt}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute -top-2 -right-2 btn btn-circle btn-error btn-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            disabled={uploadingImage}
+            className="file-input file-input-bordered w-full"
+          />
+          {uploadingImage && (
+            <div className="mt-2">
+              <span className="loading loading-spinner loading-sm"></span>
+              {' '}Uploading...
+            </div>
+          )}
         </div>
       </div>
 

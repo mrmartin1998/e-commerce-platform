@@ -2,11 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ProductCard({ product }) {
+  const mainImage = product.images?.[0]?.url || '/images/placeholder.png';
+  
   return (
     <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
       <figure className="relative h-48">
         <Image
-          src={product.image || '/images/placeholder.png'}
+          src={mainImage}
           alt={product.name}
           fill
           className="object-cover"

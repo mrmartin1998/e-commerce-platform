@@ -26,12 +26,14 @@ export default function ProductDetailPage() {
   }, [params?.id]);
 
   if (loading) {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return <div className="flex justify-center p-8">
+      <span className="loading loading-spinner loading-lg"></span>
+    </div>;
   }
 
-  if (!product) {
-    return <div className="flex justify-center p-8">Product not found</div>;
-  }
+  if (!product) return null;
+
+  const mainImage = product.images?.[0]?.url || '/images/placeholder.png';
 
   return (
     <div className="container mx-auto p-4">
@@ -40,15 +42,17 @@ export default function ProductDetailPage() {
       </Link>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Image Section */}
-        <div className="relative h-96 bg-base-200 rounded-lg overflow-hidden">
-          <Image
-            src={product.image || '/images/placeholder.png'}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
+        {/* Product Image Section */}
+        <div className="flex justify-center items-center">
+          <div className="relative aspect-square bg-base-200 rounded-lg overflow-hidden w-full max-w-md">
+            <Image
+              src={mainImage}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
         </div>
 
         {/* Product Info Section */}

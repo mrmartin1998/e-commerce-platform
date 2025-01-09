@@ -97,7 +97,7 @@ export default function AdminProductsPage() {
                 <td>
                   <div className="w-16 h-16 relative">
                     <Image
-                      src={product.image || '/images/placeholder.png'}
+                      src={product.images?.[0]?.url || '/images/placeholder.png'}
                       alt={product.name}
                       fill
                       className="object-cover rounded"
