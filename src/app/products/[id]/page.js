@@ -64,9 +64,11 @@ export default function ProductDetailPage() {
           
           <div className="flex flex-col gap-4 mt-8">
             <AddToCartButton productId={product._id} />
+            {/*
             <button className="btn btn-outline">
               Add to Wishlist
             </button>
+            */}
           </div>
         </div>
       </div>
