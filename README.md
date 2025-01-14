@@ -9,7 +9,6 @@ A robust e-commerce solution built with Next.js 15 that delivers a seamless shop
   - Secure login/register system
   - JWTthentication
  - Protected routes
- - Password reset functionality
 - **Shopping Experience**
  - Browse products with grid/list view options
  - Advanced product filtering and search
