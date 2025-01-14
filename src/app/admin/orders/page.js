@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
 
 export default function AdminOrdersPage() {
@@ -10,11 +10,7 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [statusFilter]);
-
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     try {
       const params = new URLSearchParams({
         page: '1',
@@ -44,7 +40,11 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [statusFilter]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   async function handleStatusUpdate(orderId, newStatus) {
     try {

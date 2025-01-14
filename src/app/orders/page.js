@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,11 +14,7 @@ export default function OrdersPage() {
   const [pagination, setPagination] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchOrders();
-  }, [currentPage]);
-
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -52,7 +48,11 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [currentPage, router]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   async function viewOrderDetails(orderId) {
     try {
@@ -155,7 +155,7 @@ export default function OrdersPage() {
 
       {orders.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-lg mb-4">You haven't placed any orders yet.</p>
+          <p className="text-lg mb-4">You haven&apos;t placed any orders yet.</p>
           <Link href="/products" className="btn btn-primary">
             Start Shopping
           </Link>

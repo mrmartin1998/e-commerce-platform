@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import Link from 'next/link';
 
-export default function SuccessPage() {
+function SuccessContent() {
   const [status, setStatus] = useState('loading');
   const [orderDetails, setOrderDetails] = useState(null);
   const searchParams = useSearchParams();
@@ -74,7 +74,7 @@ export default function SuccessPage() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 space-y-4">
         <div className="text-error text-5xl">⚠️</div>
         <h1 className="text-2xl font-bold text-error">Payment Verification Failed</h1>
-        <p className="text-gray-600">We couldn't verify your payment. Please contact support if you believe this is an error.</p>
+        <p className="text-gray-600">We couldn&apos;t verify your payment. Please contact support if you believe this is an error.</p>
         <div className="flex gap-4 mt-4">
           <Link href="/cart" className="btn btn-primary">
             Return to Cart
@@ -136,5 +136,17 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
