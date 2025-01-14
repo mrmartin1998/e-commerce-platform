@@ -1,6 +1,6 @@
 # E-Commerce Platform
 
-A modern, full-featured e-commerce platform built with Next.js, featuring a responsive design, secure authentication, and comprehensive shopping features.
+A robust e-commerce solution built with Next.js 15 that delivers a seamless shopping experience. This platform combines modern design principles with enterprise-grade features including secure user authentication, real-time inventory management, and Stripe payment processing. Perfect for businesses looking to establish a strong online presence, it offers comprehensive admin tools for product and order management, detailed analytics, and a user-friendly shopping interface with advanced filtering and search capabilities.
 
 ## Features
 
