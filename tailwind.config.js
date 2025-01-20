@@ -11,6 +11,28 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '1rem',
+          sm: '2rem',
+          lg: '4rem',
+          xl: '5rem',
+          '2xl': '6rem',
+        },
+        screens: {
+          sm: '640px',    // Mobile (default)
+          md: '768px',    // Tablet
+          lg: '1024px',   // Desktop
+          xl: '1280px',   // Large Desktop
+          '2xl': '1536px' // Extra Large
+        },
+      },
+      spacing: {
+        '18': '4.5rem',
+        '112': '28rem',
+        '128': '32rem',
+      }
     },
   },
   plugins: [require("daisyui")],

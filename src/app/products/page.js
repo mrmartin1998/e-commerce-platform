@@ -25,19 +25,21 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Our Products</h1>
-        <div className="join">
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
+        <div className="join self-end sm:self-auto">
           <button 
             className={`btn join-item btn-sm ${viewType === 'grid' ? 'btn-active' : ''}`}
             onClick={() => setViewType('grid')}
+            aria-label="Grid view"
           >
             Grid
           </button>
           <button 
             className={`btn join-item btn-sm ${viewType === 'list' ? 'btn-active' : ''}`}
             onClick={() => setViewType('list')}
+            aria-label="List view"
           >
             List
           </button>
@@ -45,7 +47,7 @@ export default function ProductsPage() {
       </div>
 
       {viewType === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {products?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}

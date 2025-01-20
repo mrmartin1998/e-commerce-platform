@@ -6,23 +6,32 @@ export default function ProductListItem({ product }) {
   
   return (
     <div className="card card-side bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
-      <figure className="relative w-48">
+      <figure className="relative w-32 sm:w-48 shrink-0">
         <Image
           src={mainImage}
           alt={product.name}
           fill
           className="object-cover"
-          sizes="(max-width: 768px) 100vw, 384px"
+          sizes="(max-width: 640px) 128px, 192px"
         />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title">{product.name}</h2>
-        <p className="text-gray-500">{product.description}</p>
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-xl font-bold">${product.price}</span>
-          <Link href={`/products/${product._id}`} className="btn btn-primary">
-            View Details
-          </Link>
+      <div className="card-body p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="space-y-2 flex-1">
+            <h2 className="card-title text-lg sm:text-xl">{product.name}</h2>
+            <p className="text-sm text-gray-500 line-clamp-2 sm:line-clamp-3">
+              {product.description}
+            </p>
+          </div>
+          <div className="flex flex-row sm:flex-col justify-between sm:justify-center items-end gap-4">
+            <span className="text-lg sm:text-xl font-bold">${product.price}</span>
+            <Link 
+              href={`/products/${product._id}`} 
+              className="btn btn-primary btn-sm sm:btn-md"
+            >
+              View Details
+            </Link>
+          </div>
         </div>
       </div>
     </div>

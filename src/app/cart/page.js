@@ -35,51 +35,49 @@ export default function CartPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Shopping Cart</h1>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
-            <div key={item.productId} className="card card-side bg-base-100 shadow-xl">
-              <figure className="w-32 h-32 relative">
+            <div key={item.productId} className="card card-compact sm:card-side bg-base-100 shadow-xl">
+              <figure className="w-full sm:w-48 h-48 sm:h-full relative">
                 <Image
                   src={item.image || '/images/placeholder.png'}
                   alt={item.name}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 192px"
                 />
               </figure>
               <div className="card-body">
-                <h2 className="card-title">{item.name}</h2>
-                <p className="text-xl">${item.price}</p>
-                <div className="flex items-center gap-4">
-                  <div className="join">
-                    <button 
-                      className="btn join-item"
-                      onClick={() => updateQuantity(item.productId, Math.max(1, item.quantity - 1))}
-                    >
-                      -
-                    </button>
-                    <input 
-                      type="text" 
-                      className="join-item w-16 text-center"
-                      value={item.quantity}
-                      readOnly
-                    />
-                    <button 
-                      className="btn join-item"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                    >
-                      +
-                    </button>
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <div>
+                    <h2 className="card-title">{item.name}</h2>
+                    <p className="text-lg font-bold">${item.price}</p>
                   </div>
-                  <button 
-                    className="btn btn-error btn-sm"
-                    onClick={() => removeItem(item.productId)}
-                  >
-                    Remove
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <div className="join">
+                      <button 
+                        className="btn btn-sm join-item"
+                        onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
+                      >-</button>
+                      <span className="btn btn-sm join-item no-animation pointer-events-none">
+                        {item.quantity}
+                      </span>
+                      <button 
+                        className="btn btn-sm join-item"
+                        onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      >+</button>
+                    </div>
+                    <button 
+                      onClick={() => removeItem(item.productId)}
+                      className="btn btn-ghost btn-sm"
+                      aria-label="Remove item"
+                    >×</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,15 +88,20 @@ export default function CartPage() {
         <div className="card bg-base-100 shadow-xl h-fit">
           <div className="card-body">
             <h2 className="card-title">Order Summary</h2>
-            <div className="divider"></div>
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+            <div className="py-4">
+              <div className="flex justify-between text-lg font-bold">
+                <span>Subtotal</span>
+                <span>${subtotal}</span>
+              </div>
             </div>
-            <div className="divider"></div>
-            <Link href="/checkout" className="btn btn-primary w-full">
-              Proceed to Checkout
-            </Link>
+            <div className="card-actions">
+              <Link 
+                href="/checkout" 
+                className="btn btn-primary btn-block"
+              >
+                Proceed to Checkout
+              </Link>
+            </div>
           </div>
         </div>
       </div>

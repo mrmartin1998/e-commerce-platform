@@ -119,126 +119,128 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Order Summary */}
-        <div className="lg:col-span-2">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title">Order Summary</h2>
-              <div className="divider"></div>
-              
-              {items.map((item) => (
-                <div key={item.productId} className="flex items-center gap-6 mb-4">
-                  <div className="w-20 h-20 relative shrink-0">
-                    <Image
-                      src={item.image || '/images/placeholder.png'}
-                      alt={item.name}
-                      fill
-                      className="object-cover rounded-lg"
-                    />
+    <div className="min-h-[calc(100vh-4rem)] p-4">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Checkout</h1>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          {/* Order Summary */}
+          <div className="lg:col-span-2">
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Order Summary</h2>
+                <div className="divider"></div>
+                
+                {items.map((item) => (
+                  <div key={item.productId} className="flex items-center gap-6 mb-4">
+                    <div className="w-20 h-20 relative shrink-0">
+                      <Image
+                        src={item.image || '/images/placeholder.png'}
+                        alt={item.name}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-lg truncate">{item.name}</h3>
+                      <p className="text-base-content/70">Quantity: {item.quantity}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm text-base-content/70">${item.price.toFixed(2)} each</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-lg truncate">{item.name}</h3>
-                    <p className="text-base-content/70">Quantity: {item.quantity}</p>
+                ))}
+                
+                <div className="divider"></div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</p>
-                    <p className="text-sm text-base-content/70">${item.price.toFixed(2)} each</p>
+                  <div className="flex justify-between">
+                    <span>Shipping</span>
+                    <span>${shipping.toFixed(2)}</span>
                   </div>
-                </div>
-              ))}
-              
-              <div className="divider"></div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>${shipping.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <div className="flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Shipping Address Selection */}
-          <div className="card bg-base-100 shadow-xl mt-8">
-            <div className="card-body">
-              <div className="flex justify-between items-center">
-                <h2 className="card-title">Shipping Address</h2>
-                <Link href="/profile" className="btn btn-ghost btn-sm">
-                  Manage Addresses
-                </Link>
-              </div>
-              <div className="divider"></div>
-              
-              {addresses.length > 0 ? (
-                <div className="grid gap-4">
-                  {addresses.map((address) => (
-                    <div 
-                      key={address._id}
-                      className={`card bg-base-200 cursor-pointer hover:bg-base-300 transition-colors
-                        ${selectedAddress?._id === address._id ? 'ring-2 ring-primary' : ''}`}
-                      onClick={() => setSelectedAddress(address)}
-                    >
-                      <div className="card-body p-4">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p>{address.street}</p>
-                            <p>{address.city}, {address.state} {address.zipCode}</p>
-                            <p>{address.country}</p>
-                            {address.isDefault && (
-                              <span className="badge badge-primary mt-2">Default</span>
-                            )}
-                          </div>
-                          <input 
-                            type="radio"
-                            className="radio radio-primary"
-                            checked={selectedAddress?._id === address._id}
-                            onChange={() => setSelectedAddress(address)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="mb-4">No shipping addresses found.</p>
-                  <Link href="/profile" className="btn btn-primary btn-sm">
-                    Add Address
+            {/* Shipping Address Selection */}
+            <div className="card bg-base-100 shadow-xl mt-8">
+              <div className="card-body">
+                <div className="flex justify-between items-center">
+                  <h2 className="card-title">Shipping Address</h2>
+                  <Link href="/profile" className="btn btn-ghost btn-sm">
+                    Manage Addresses
                   </Link>
                 </div>
-              )}
+                <div className="divider"></div>
+                
+                {addresses.length > 0 ? (
+                  <div className="space-y-4">
+                    {addresses.map((address) => (
+                      <div 
+                        key={address._id}
+                        className={`card bg-base-200 cursor-pointer hover:bg-base-300 transition-colors
+                          ${selectedAddress?._id === address._id ? 'ring-2 ring-primary' : ''}`}
+                        onClick={() => setSelectedAddress(address)}
+                      >
+                        <div className="card-body p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p>{address.street}</p>
+                              <p>{address.city}, {address.state} {address.zipCode}</p>
+                              <p>{address.country}</p>
+                              {address.isDefault && (
+                                <span className="badge badge-primary mt-2">Default</span>
+                              )}
+                            </div>
+                            <input 
+                              type="radio"
+                              className="radio radio-primary"
+                              checked={selectedAddress?._id === address._id}
+                              onChange={() => setSelectedAddress(address)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="mb-4">No shipping addresses found.</p>
+                    <Link href="/profile" className="btn btn-primary btn-sm">
+                      Add Address
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Payment */}
-        <div className="card bg-base-100 shadow-xl h-fit">
-          <div className="card-body">
-            <h2 className="card-title">Payment</h2>
-            <div className="divider"></div>
-            {error && (
-              <div className="alert alert-error mb-4">
-                {error}
-              </div>
-            )}
-            <button 
-              className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
-              onClick={handleCheckout}
-              disabled={loading}
-            >
-              {loading ? 'Processing...' : 'Proceed to Payment'}
-            </button>
+          {/* Payment */}
+          <div className="card bg-base-100 shadow-xl h-fit">
+            <div className="card-body">
+              <h2 className="card-title">Payment</h2>
+              <div className="divider"></div>
+              {error && (
+                <div className="alert alert-error mb-4">
+                  {error}
+                </div>
+              )}
+              <button 
+                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                onClick={handleCheckout}
+                disabled={loading}
+              >
+                {loading ? 'Processing...' : 'Proceed to Payment'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
