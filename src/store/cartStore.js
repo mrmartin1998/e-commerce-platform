@@ -38,6 +38,7 @@ export function CartProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
+      console.log('Cart API Response:', data);
       
       if (data.error) throw new Error(data.error);
       dispatch({ type: 'SET_ITEMS', payload: data.items || [] });

@@ -35,7 +35,10 @@ export const PUT = requireAuth(async function(request) {
         }
       },
       { new: true }
-    ).populate('items.productId', 'name image');
+    ).populate({
+      path: 'items.productId',
+      select: 'name images price'
+    });
 
     if (!cart) {
       return NextResponse.json(
@@ -50,7 +53,7 @@ export const PUT = requireAuth(async function(request) {
       quantity: item.quantity,
       price: item.price,
       name: item.productId.name,
-      image: item.productId.image
+      image: item.productId?.images?.[0]?.url || null
     }));
 
     return NextResponse.json({ items });

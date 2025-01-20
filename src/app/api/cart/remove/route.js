@@ -29,7 +29,7 @@ export const DELETE = requireAuth(async function(request) {
       quantity: item.quantity,
       price: item.price,
       name: item.productId?.name || 'Product Not Found',
-      image: item.productId?.images?.[0] || null
+      image: item.productId?.images?.[0]?.url || null
     }));
 
     return NextResponse.json({ items });

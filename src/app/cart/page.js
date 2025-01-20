@@ -12,6 +12,9 @@ export default function CartPage() {
     fetchCart();
   }, [fetchCart]);
 
+  // Add this debug log
+  console.log('Cart Items:', items);
+
   if (loading) {
     return <div className="flex justify-center p-8">Loading...</div>;
   }
@@ -42,13 +45,14 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => (
             <div key={item.productId} className="card card-compact sm:card-side bg-base-100 shadow-xl">
-              <figure className="w-full sm:w-48 h-48 sm:h-full relative">
+              <figure className="w-full sm:w-48 h-48 relative">
                 <Image
                   src={item.image || '/images/placeholder.png'}
                   alt={item.name}
                   fill
-                  className="object-cover"
+                  className="object-cover rounded-lg"
                   sizes="(max-width: 640px) 100vw, 192px"
+                  priority={true}
                 />
               </figure>
               <div className="card-body">

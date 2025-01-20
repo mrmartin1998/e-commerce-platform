@@ -55,7 +55,7 @@ export const POST = requireAuth(async function(request) {
       quantity: item.quantity,
       price: item.price,
       name: product.name,
-      image: product.image
+      image: product.images?.[0]?.url || null
     }));
 
     return NextResponse.json({ items });
