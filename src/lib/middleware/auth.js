@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { User, TokenBlacklist } from '@/lib/models';
 import { NextResponse } from 'next/server';
+import connectDB from '@/lib/db/mongoose';
 
 export async function verifyAuth(request) {
   try {
@@ -10,6 +11,8 @@ export async function verifyAuth(request) {
       return null;
     }
 
+    await connectDB(); // Single connection point
+
     // Check if token is blacklisted
     const blacklisted = await TokenBlacklist.findOne({ token });
     if (blacklisted) {
@@ -17,7 +20,9 @@ export async function verifyAuth(request) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId).select('-password');
+    // Include all fields we need for profile
+    const user = await User.findById(decoded.userId)
+      .select('-password -refreshToken');
     
     if (!user) {
       return null;

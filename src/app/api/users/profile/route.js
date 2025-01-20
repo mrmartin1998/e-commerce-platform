@@ -1,28 +1,16 @@
 import { User } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAuth } from '@/lib/middleware/auth';
+import { NextResponse } from 'next/server';
 
 // GET /api/users/profile
 export const GET = requireAuth(async function(request) {
   try {
-    await connectDB();
-    
-    const user = await User
-      .findById(request.user._id)
-      .select('-password -refreshToken');
-
-    if (!user) {
-      return Response.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    return Response.json({ user });
-
+    // Use the user object from auth middleware
+    return NextResponse.json({ user: request.user });
   } catch (error) {
     console.error('Profile fetch error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
@@ -48,11 +36,11 @@ export const PUT = requireAuth(async function(request) {
       { new: true }
     ).select('-password -refreshToken');
 
-    return Response.json({ user });
+    return NextResponse.json({ user });
 
   } catch (error) {
     console.error('Profile update error:', error);
-    return Response.json(
+    return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
