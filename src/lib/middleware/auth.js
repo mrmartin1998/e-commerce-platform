@@ -5,10 +5,8 @@ import { NextResponse } from 'next/server';
 export async function verifyAuth(request) {
   try {
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');
-    console.log('Token:', token);
     
     if (!token) {
-      console.log('No token found');
       return null;
     }
 
@@ -19,18 +17,15 @@ export async function verifyAuth(request) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded);
-    
     const user = await User.findById(decoded.userId).select('-password');
-    console.log('Found user:', user);
     
     if (!user) {
-      console.log('No user found');
       return null;
     }
 
     return user;
   } catch (error) {
+    // Keep only this critical error log
     console.error('Auth error:', error);
     return null;
   }
