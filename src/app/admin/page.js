@@ -100,6 +100,15 @@ export default function AdminDashboard() {
         <Link href="/admin/products" className="btn btn-outline">
           View All Products
         </Link>
+        <Link href="/admin/sales" className="btn btn-outline">
+          View All Sales
+        </Link>
+        <Link href="/admin/customers" className="btn btn-outline">
+          View All Customers
+        </Link>
+        <Link href="/admin/inventory" className="btn btn-outline">
+          View All Inventory
+        </Link>
       </div>
 
       {/* Recent Orders */}
