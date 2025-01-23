@@ -69,12 +69,16 @@ export default function Navbar() {
             role="button" 
             className="btn btn-ghost lg:hidden mobile-menu-button"
             onClick={toggleMobileMenu}
+            aria-expanded={isMobileMenuOpen}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
             </svg>
           </div>
-          <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <ul 
+            tabIndex={0} 
+            className={`menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+          >
             <li><Link href="/products" onClick={toggleMobileMenu}>Products</Link></li>
             <li><Link href="/categories" onClick={toggleMobileMenu}>Categories</Link></li>
             <li><Link href="/cart" onClick={toggleMobileMenu}>Cart</Link></li>
@@ -102,6 +106,7 @@ export default function Navbar() {
               role="button" 
               className="btn btn-ghost btn-circle avatar profile-menu-button"
               onClick={toggleProfileMenu}
+              aria-expanded={isProfileMenuOpen}
             >
               <div className="w-10 rounded-full bg-primary text-primary-content">
                 <span className="text-xl leading-10 text-center block">
@@ -109,7 +114,10 @@ export default function Navbar() {
                 </span>
               </div>
             </div>
-            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+            <ul 
+              tabIndex={0} 
+              className={`mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 ${isProfileMenuOpen ? 'block' : 'hidden'}`}
+            >
               <li><Link href="/profile" onClick={toggleProfileMenu}>Profile</Link></li>
               <li><Link href="/orders" onClick={toggleProfileMenu}>Orders</Link></li>
               {user?.isAdmin && (
