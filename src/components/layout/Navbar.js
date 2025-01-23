@@ -21,6 +21,7 @@ export default function Navbar() {
       .then(res => res.json())
       .then(data => {
         if (data.user) {
+          console.log('User data:', data.user);
           setUser(data.user);
         }
       })
@@ -125,9 +126,17 @@ export default function Navbar() {
             >
               <li><Link href="/profile" onClick={toggleProfileMenu}>Profile</Link></li>
               <li><Link href="/orders" onClick={toggleProfileMenu}>Orders</Link></li>
+              
+              {/* Admin Section */}
               {user?.isAdmin && (
-                <li><Link href="/admin/products" onClick={toggleProfileMenu}>Manage Products</Link></li>
+                <>
+                  <div className="divider my-0">Admin</div>
+                  <li><Link href="/admin" onClick={toggleProfileMenu}>Admin</Link></li>
+                  <li><Link href="/admin/products" onClick={toggleProfileMenu}>Manage Products</Link></li>
+                  <li><Link href="/admin/orders" onClick={toggleProfileMenu}>Manage Orders</Link></li>
+                </>
               )}
+              
               <li><button onClick={() => { toggleProfileMenu(); handleLogout(); }}>Logout</button></li>
             </ul>
           </div>

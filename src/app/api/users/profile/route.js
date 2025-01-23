@@ -6,8 +6,26 @@ import { NextResponse } from 'next/server';
 // GET /api/users/profile
 export const GET = requireAuth(async function(request) {
   try {
-    // Use the user object from auth middleware
-    return NextResponse.json({ user: request.user });
+    await connectDB();
+    
+    // Fetch fresh user data to ensure we have the latest admin status
+    const user = await User.findById(request.user._id)
+      .select('-password -refreshToken');
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Explicitly set isAdmin based on role or isAdmin field
+    const userData = user.toObject();
+    userData.isAdmin = user.isAdmin || user.role === 'admin';
+
+    return NextResponse.json({ 
+      user: userData
+    });
   } catch (error) {
     console.error('Profile fetch error:', error);
     return NextResponse.json(
