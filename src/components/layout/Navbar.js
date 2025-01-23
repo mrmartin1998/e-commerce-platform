@@ -80,8 +80,11 @@ export default function Navbar() {
             className={`menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
           >
             <li><Link href="/products" onClick={toggleMobileMenu}>Products</Link></li>
+            {/* 
             <li><Link href="/categories" onClick={toggleMobileMenu}>Categories</Link></li>
+            */}
             <li><Link href="/cart" onClick={toggleMobileMenu}>Cart</Link></li>
+            
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">E-Commerce</Link>
@@ -90,7 +93,9 @@ export default function Navbar() {
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
           <li><Link href="/products">Products</Link></li>
+          {/* 
           <li><Link href="/categories">Categories</Link></li>
+          */}
           <li><Link href="/cart">Cart</Link></li>
         </ul>
       </div>
