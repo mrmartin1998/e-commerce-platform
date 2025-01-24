@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         <Link href="/admin/customers/analytics" className="btn btn-outline">
           View All Customers
         </Link>
-        <Link href="/admin/inventory" className="btn btn-outline">
+        <Link href="/admin/inventory/analytics" className="btn btn-outline">
           View All Inventory
         </Link>
       </div>
