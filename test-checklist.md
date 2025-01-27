@@ -1,128 +1,193 @@
 # E-Commerce Platform Test Checklist
 
 ## 1. Authentication & User Management
-- [x] User Registration
-  - [x] Register with valid credentials
-  - [x] Validate email format
-  - [x] Password confirmation match
-  - [x] Error handling for existing email
+- [ ] User Registration
+  - [ ] Register with valid credentials
+  - [ ] Validate email format
+  - [ ] Password confirmation match
+  - [ ] Error handling for existing email
 
-- [x] User Login
-  - [x] Login with valid credentials
-  - [x] Error handling for invalid credentials
-  - [x] Token storage in localStorage
-  - [x] Persistence of login state after refresh
+- [ ] User Login
+  - [ ] Login with valid credentials
+  - [ ] Error handling for invalid credentials
+  - [ ] Token storage in localStorage
+  - [ ] Persistence of login state after refresh
 
-- [x] User Logout
-  - [x] Clean logout
-  - [x] Token removal
-  - [x] Redirect to home page
+- [ ] User Logout
+  - [ ] Clean logout
+  - [ ] Token removal
+  - [ ] Redirect to home page
 
 General auth issues:
   - After logging in the token only lasts for a few minutes after that it expires.
 
+Additional Test Cases:
+- [ ] Password Reset Flow
+  - [ ] Reset email delivery
+  - [ ] Reset token expiration
+  - [ ] New password validation
+  - [ ] Success/error notifications
+
+- [ ] Session Management
+  - [ ] Token refresh mechanism
+  - [ ] Multiple device handling
+  - [ ] Session timeout handling
+  - [ ] Remember me functionality
+
 ## 2. Navigation & UI
-- [x] Responsive Design
-  - [x] Mobile view
-  - [x] Tablet view
-  - [x] Desktop view
+- [ ] Responsive Design
+  - [ ] Mobile view
+  - [ ] Tablet view
+  - [ ] Desktop view
 
 Issues: Does not work resize properly. there are a lot of issues with the responsive design.
 
-- [x] Theme Switching
-  - [x] Dark/Light mode toggle
-  - [x] Theme persistence
+- [ ] Theme Switching
+  - [ ] Dark/Light mode toggle
+  - [ ] Theme persistence
 
 Issues: We can toggle the theme but it does not persist.
 
-- [x] Navigation Menu
-  - [x] Mobile hamburger menu
-  - [x] Desktop navigation links
-  - [x] User avatar dropdown
-  - [x] Admin-specific menu items
+- [ ] Navigation Menu
+  - [ ] Mobile hamburger menu
+  - [ ] Desktop navigation links
+  - [ ] User avatar dropdown
+  - [ ] Admin-specific menu items
 
 Issues:
   - The hamburger works but when i click it (tap it) I want it to close again.
   - The desktop actualy works without issue, only thing i want is when we click the avatar dropdown it should open and when we click it again it should close.
   - The admin-specific menu, we never really added a feature as to how to make it work.
 
-## 3. Product Browsing
-- [x] Product Listing
-  - [x] Grid view
-  - [x] List view
-  - [x] Image loading
-  - [x] Price display
-  - [x] Product details
+Additional Test Cases:
+- [ ] Search Functionality
+  - [ ] Search suggestions
+  - [ ] Filter persistence
+  - [ ] Search history
+  - [ ] No results handling
 
-- [x] Product Details Page
-  - [x] Image display
-  - [x] Product information
-  - [x] Price
-  - [x] Stock status
-  - [x] Add to cart functionality
+- [ ] Accessibility
+  - [ ] Keyboard navigation
+  - [ ] Screen reader compatibility
+  - [ ] Color contrast
+  - [ ] Focus indicators
+
+## 3. Product Browsing
+- [ ] Product Listing
+  - [ ] Grid view
+  - [ ] List view
+  - [ ] Image loading
+  - [ ] Price display
+  - [ ] Product details
+
+- [ ] Product Details Page
+  - [ ] Image display
+  - [ ] Product information
+  - [ ] Price
+  - [ ] Stock status
+  - [ ] Add to cart functionality
+
+Additional Test Cases:
+- [ ] Product Filtering
+  - [ ] Price range filter
+  - [ ] Category filter
+  - [ ] Multiple filter combination
+  - [ ] Filter clear/reset
+
+- [ ] Product Sorting
+  - [ ] Price (high/low)
+  - [ ] Newest first
+  - [ ] Best selling
+  - [ ] Rating
 
 ## 4. Shopping Cart
-- [x] Cart Operations
-  - [x] Add items to cart
-  - [x] Update quantities
-  - [x] Remove items
-  - [x] Cart persistence after refresh
-  - [x] Price calculations
+- [ ] Cart Operations
+  - [ ] Add items to cart
+  - [ ] Update quantities
+  - [ ] Remove items
+  - [ ] Cart persistence after refresh
+  - [ ] Price calculations
 
-- [x] Cart UI
-  - [x] Empty cart state
-  - [x] Cart item display
-  - [x] Subtotal calculation
-  - [x] Proceed to checkout button
+- [ ] Cart UI
+  - [ ] Empty cart state
+  - [ ] Cart item display
+  - [ ] Subtotal calculation
+  - [ ] Proceed to checkout button
 
 issues: 
  - Product image doesn't show up in cart.
 
-## 5. Checkout Process
-- [x] Shipping Address
-  - [x] Address selection
-  - [x] Multiple addresses support
-  - [x] Default address handling
+Additional Test Cases:
+- [ ] Cart Features
+  - [ ] Save for later
+  - [ ] Move to wishlist
+  - [ ] Quantity limitations
+  - [ ] Stock validation
 
-- [x] Payment Processing
-  - [x] Stripe integration
-  - [x] Payment form
-  - [x] Error handling
-  - [x] Success/failure redirects
+## 5. Checkout Process
+- [ ] Shipping Address
+  - [ ] Address selection
+  - [ ] Multiple addresses support
+  - [ ] Default address handling
+
+- [ ] Payment Processing
+  - [ ] Stripe integration
+  - [ ] Payment form
+  - [ ] Error handling
+  - [ ] Success/failure redirects
 
 Issues:
   - User runs into errors when trying to checkout. Is able to access checkout but runs into issues with the checkout success/failure redirects.
 
   - It works in the development environment but not in the production environment. i am talking about the stripe integration.
 
+Additional Test Cases:
+- [ ] Guest Checkout
+  - [ ] Email validation
+  - [ ] Convert to registered user
+  - [ ] Order tracking access
+
+- [ ] Order Review
+  - [ ] Price breakdown
+  - [ ] Shipping method selection
+  - [ ] Discount code application
+  - [ ] Tax calculation
+
 ## 6. Order Management
-- [x] Order Creation
-  - [x] Order confirmation
-  - [x] Email notifications
-  - [x] Stock updates
+- [ ] Order Creation
+  - [ ] Order confirmation
+  - [ ] Email notifications
+  - [ ] Stock updates
 
 Issues:
   - The order is created and added.
   - There is no email notification, this feature has never been created.
 
-- [x] Order History
-  - [x] Order listing
-  - [x] Order details view
-  - [x] Order status display
+- [ ] Order History
+  - [ ] Order listing
+  - [ ] Order details view
+  - [ ] Order status display
+
+Additional Test Cases:
+- [ ] Order Tracking
+  - [ ] Status updates
+  - [ ] Shipping tracking integration
+  - [ ] Delivery estimates
+  - [ ] Order modifications
 
 ## 7. Admin Features
-- [x] Product Management
-  - [x] Add new products
-  - [x] Edit existing products
-  - [x] Delete products
-  - [x] Image upload
-  - [x] Stock management
+- [ ] Product Management
+  - [ ] Add new products
+  - [ ] Edit existing products
+  - [ ] Delete products
+  - [ ] Image upload
+  - [ ] Stock management
 
-- [x] Dashboard
-  - [x] Sales metrics
-  - [x] User statistics
-  - [x] Product inventory
-  - [x] Recent orders
+- [ ] Dashboard
+  - [ ] Sales metrics
+  - [ ] User statistics
+  - [ ] Product inventory
+  - [ ] Recent orders
 
 Issues:
   - We have a very basic dashboard. It works fine but it is not very useful. It only show:
@@ -133,43 +198,100 @@ Issues:
   So yes, it "meets" the requirements but it is not very useful.
   - We have a lot of features that we can add to the dashboard but we never really added them.
 
+Additional Test Cases:
+- [ ] Advanced Analytics
+  - [ ] Sales forecasting
+  - [ ] Inventory predictions
+  - [ ] Customer segmentation
+  - [ ] Performance metrics
+
+- [ ] Bulk Operations
+  - [ ] Product import/export
+  - [ ] Price updates
+  - [ ] Stock adjustments
+  - [ ] Order processing
+
 ## 8. Error Handling
-- [x] API Errors
-  - [x] Network error handling
-  - [x] Invalid input handling
-  - [x] Server error handling
-  - [x] User-friendly error messages
+- [ ] API Errors
+  - [ ] Network error handling
+  - [ ] Invalid input handling
+  - [ ] Server error handling
+  - [ ] User-friendly error messages
+
+Additional Test Cases:
+- [ ] Recovery Scenarios
+  - [ ] Cart recovery
+  - [ ] Form data persistence
+  - [ ] Session recovery
+  - [ ] Connection retry
 
 ## 9. Performance
-- [x] Page Load Times
-  - [x] Initial load
-  - [x] Navigation between pages
-  - [x] Image optimization
-  - [x] API response times
+- [ ] Page Load Times
+  - [ ] Initial load
+  - [ ] Navigation between pages
+  - [ ] Image optimization
+  - [ ] API response times
 
   Issues:
     - The webapp is not very fast in general.
 
+Additional Test Cases:
+- [ ] Optimization
+  - [ ] Image lazy loading
+  - [ ] Code splitting
+  - [ ] API response caching
+  - [ ] Bundle size optimization
+
 ## 10. Security
-- [x] Authentication
-  - [x] Token expiration
-  - [x] Protected routes
-  - [x] Admin route protection
+- [ ] Authentication
+  - [ ] Token expiration
+  - [ ] Protected routes
+  - [ ] Admin route protection
 
-- [x] Data Validation
-  - [x] Input sanitization
-  - [x] Form validation
-  - [x] API payload validation
+- [ ] Data Validation
+  - [ ] Input sanitization
+  - [ ] Form validation
+  - [ ] API payload validation
 
-## 11. Cross-browser Testing
-- [x] Browser Compatibility
-  - [x] Chrome
-  - [x] Firefox
-  - [x] Safari
-  - [x] Edge
+Additional Test Cases:
+- [ ] Advanced Security
+  - [ ] Rate limiting
+  - [ ] CSRF protection
+  - [ ] SQL injection prevention
+  - [ ] XSS protection
+
+## 11. Analytics & Reporting
+- [ ] User Behavior
+  - [ ] Page view tracking
+  - [ ] Click tracking
+  - [ ] Session duration
+  - [ ] Bounce rate
+
+- [ ] Business Metrics
+  - [ ] Conversion rate
+  - [ ] Average order value
+  - [ ] Customer lifetime value
+  - [ ] Return customer rate
+
+## 12. Mobile Experience
+- [ ] Mobile Features
+  - [ ] Touch gestures
+  - [ ] Mobile navigation
+  - [ ] App-like experience
+  - [ ] Offline capabilities
+
+## 13. Integration Testing
+- [ ] Third-party Services
+  - [ ] Payment gateway
+  - [ ] Email service
+  - [ ] Analytics tools
+  - [ ] Shipping calculators
 
 ## Notes:
 - Mark each item with [x] when tested successfully
 - Add comments or issues found during testing below each section
 - Document any bugs or unexpected behavior
-- Test on multiple devices when possible 
+- Test on multiple devices and browsers
+- Include performance metrics where applicable
+- Document any security concerns immediately
+ 
