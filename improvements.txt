@@ -1,0 +1,6 @@
+- Add an "add to cart" button to the product page.
+- Capability to add several images to a product.
+
+- Add several products and users to to better test the application
+
+Not sure what else to add to improve the application.

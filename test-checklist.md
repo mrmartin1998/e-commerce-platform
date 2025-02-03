@@ -40,24 +40,15 @@ Additional Test Cases:
   - [ ] Tablet view
   - [ ] Desktop view
 
-Issues: Does not work resize properly. there are a lot of issues with the responsive design.
-
 - [ ] Theme Switching
   - [ ] Dark/Light mode toggle
   - [ ] Theme persistence
-
-Issues: We can toggle the theme but it does not persist.
 
 - [ ] Navigation Menu
   - [ ] Mobile hamburger menu
   - [ ] Desktop navigation links
   - [ ] User avatar dropdown
   - [ ] Admin-specific menu items
-
-Issues:
-  - The hamburger works but when i click it (tap it) I want it to close again.
-  - The desktop actualy works without issue, only thing i want is when we click the avatar dropdown it should open and when we click it again it should close.
-  - The admin-specific menu, we never really added a feature as to how to make it work.
 
 Additional Test Cases:
 - [ ] Search Functionality
@@ -136,11 +127,6 @@ Additional Test Cases:
   - [ ] Error handling
   - [ ] Success/failure redirects
 
-Issues:
-  - User runs into errors when trying to checkout. Is able to access checkout but runs into issues with the checkout success/failure redirects.
-
-  - It works in the development environment but not in the production environment. i am talking about the stripe integration.
-
 Additional Test Cases:
 - [ ] Guest Checkout
   - [ ] Email validation
@@ -158,10 +144,6 @@ Additional Test Cases:
   - [ ] Order confirmation
   - [ ] Email notifications
   - [ ] Stock updates
-
-Issues:
-  - The order is created and added.
-  - There is no email notification, this feature has never been created.
 
 - [ ] Order History
   - [ ] Order listing
@@ -188,15 +170,6 @@ Additional Test Cases:
   - [ ] User statistics
   - [ ] Product inventory
   - [ ] Recent orders
-
-Issues:
-  - We have a very basic dashboard. It works fine but it is not very useful. It only show:
-    - Total orders
-    - Total Users
-    - Total Products
-    - Recent orders
-  So yes, it "meets" the requirements but it is not very useful.
-  - We have a lot of features that we can add to the dashboard but we never really added them.
 
 Additional Test Cases:
 - [ ] Advanced Analytics
