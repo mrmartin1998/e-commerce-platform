@@ -1,6 +1,46 @@
-- Add an "add to cart" button to the product page.
-- Capability to add several images to a product.
+USER EXPERIENCE IMPROVEMENTS:
+- Recently Viewed Products
+  * Track and display products users have viewed
+  * Help users find items they were interested in
+  * Improve conversion rates
 
-- Add several products and users to to better test the application
+- Wishlist Functionality
+  * Allow users to save products for later
+  * Email notifications for price drops
+  * Share wishlist with others
 
-Not sure what else to add to improve the application.
+- Enhanced Product Search
+  * Implement advanced filters
+  * Search suggestions/autocomplete
+  * Category-based search
+  * Price range filters
+
+SHOPPING EXPERIENCE:
+- Product Reviews & Ratings
+  * User reviews with photos
+  * Star ratings
+  * Verified purchase badges
+  * Review moderation system
+
+- Related Products
+  * Show similar items
+  * "Customers also bought" section
+  * Bundle suggestions
+
+- Stock Notifications
+  * Email alerts when out-of-stock items are available
+  * Back-in-stock notifications
+  * Low stock warnings ("Only 2 left!")
+
+ORDER MANAGEMENT:
+- Order Tracking
+  * Real-time order status
+  * Shipment tracking integration
+  * Delivery estimates
+  * Order history with better filtering
+
+- Returns Management
+  * Self-service return initiation
+  * Return label generation
+  * Return status tracking
+  * Refund processing
