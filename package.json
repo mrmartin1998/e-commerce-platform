@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "vitest",
+    "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +25,8 @@
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "jest": "^30.2.0",
+    "@testing-library/react": "^14.2.1",
+    "vitest": "^1.4.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1"
   }
