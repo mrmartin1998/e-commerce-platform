@@ -5,11 +5,28 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+let stripeClient;
+function getStripeClient() {
+  if (stripeClient) return stripeClient;
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Stripe secret key missing for payment verification');
+    return null;
+  }
+  stripeClient = new Stripe(secretKey);
+  return stripeClient;
+}
 
 export const GET = requireAuth(async function getHandler(request) {
   try {
     await connectDB();
+    const stripe = getStripeClient();
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Payment processor not configured' },
+        { status: 503 }
+      );
+    }
     
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('session_id');
@@ -120,4 +137,4 @@ export const GET = requireAuth(async function getHandler(request) {
       { status: 500 }
     );
   }
-}); 
+});
