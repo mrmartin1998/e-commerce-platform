@@ -1,14 +1,31 @@
 import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
-import Stripe from 'stripe';
 import { Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
+import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+let stripeClient;
+function getStripeClient() {
+  if (stripeClient) return stripeClient;
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Stripe secret key missing for checkout session creation');
+    return null;
+  }
+  stripeClient = new Stripe(secretKey);
+  return stripeClient;
+}
 
 export const POST = requireAuth(async function(request) {
   try {
     await connectDB();
+    const stripe = getStripeClient();
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Payment processor not configured' },
+        { status: 503 }
+      );
+    }
     const { items, shipping, shippingAddress } = await request.json();
 
     // Validate stock for all items
@@ -94,4 +111,4 @@ export const POST = requireAuth(async function(request) {
       { status: 500 }
     );
   }
-}); 
+});

@@ -2,11 +2,29 @@ import { Order } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+let stripeClient;
+function getStripeClient() {
+  if (stripeClient) return stripeClient;
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    console.error('Stripe secret key missing for webhook handler');
+    return null;
+  }
+  stripeClient = new Stripe(secretKey);
+  return stripeClient;
+}
 
 export async function POST(request) {
   try {
+    const stripe = getStripeClient();
+    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!stripe || !endpointSecret) {
+      console.error('Stripe webhook configuration missing');
+      return Response.json(
+        { error: 'Payment webhook not configured' },
+        { status: 503 }
+      );
+    }
     const payload = await request.text();
     const sig = request.headers.get('stripe-signature');
 
@@ -68,4 +86,4 @@ export const config = {
   api: {
     bodyParser: false,
   },
-}; 
+};

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MONGODB_URI: mongodb://127.0.0.1:27017/nomad_test
+      MONGODB_URI: mongodb://127.0.0.1:27017/e-commerce-platform_test
       NODE_ENV: test
       NEXT_PHASE: build
 
@@ -35,7 +35,7 @@ jobs:
       run: npm run typecheck || true  # Don't fail build on type check warnings for now
 
     - name: Run tests
-      run: npm test --passWithNoTests  # Allow passing if no tests yet
+      run: npm test
 
     - name: Build
       run: npm run build
@@ -48,4 +48,4 @@ jobs:
           node_modules/.cache
         key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
         restore-keys: |
-          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}- 
+          ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
