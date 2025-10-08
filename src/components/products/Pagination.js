@@ -10,103 +10,83 @@ export default function Pagination({ pagination, onPageChange, isLoading }) {
     return null;
   }
 
-  const { current, total, hasMore, totalProducts } = pagination;
-
-  const handlePageChange = (page) => {
-    if (page === current || page < 1 || page > total || isLoading) return;
-
-    // Update URL with new page
+  const handlePageClick = (page) => {
+    if (page === pagination.current || isLoading) return;
+    
     const params = new URLSearchParams(searchParams);
     params.set('page', page.toString());
     
     const newUrl = `?${params.toString()}`;
     router.replace(newUrl, { scroll: false });
     
-    // Trigger callback
     onPageChange(page);
   };
 
-  // Generate page numbers to show
-  const getPageNumbers = () => {
-    const delta = 2; // Show 2 pages before and after current
-    const range = [];
-    const rangeWithDots = [];
-
-    for (
-      let i = Math.max(2, current - delta);
-      i <= Math.min(total - 1, current + delta);
-      i++
-    ) {
-      range.push(i);
+  const generatePageNumbers = () => {
+    const pages = [];
+    const { current, total } = pagination;
+    
+    // Always show first page
+    if (current > 3) pages.push(1);
+    
+    // Show ellipsis if needed
+    if (current > 4) pages.push('...');
+    
+    // Show pages around current
+    for (let i = Math.max(1, current - 1); i <= Math.min(total, current + 1); i++) {
+      pages.push(i);
     }
-
-    if (current - delta > 2) {
-      rangeWithDots.push(1, '...');
-    } else {
-      rangeWithDots.push(1);
-    }
-
-    rangeWithDots.push(...range);
-
-    if (current + delta < total - 1) {
-      rangeWithDots.push('...', total);
-    } else if (total > 1) {
-      rangeWithDots.push(total);
-    }
-
-    return rangeWithDots;
+    
+    // Show ellipsis if needed
+    if (current < total - 3) pages.push('...');
+    
+    // Always show last page
+    if (current < total - 2) pages.push(total);
+    
+    return pages;
   };
 
-  const pageNumbers = getPageNumbers();
-
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
-      {/* Results info */}
-      <div className="text-sm opacity-70">
-        Showing page {current} of {total} ({totalProducts} total products)
-      </div>
-
-      {/* Pagination controls */}
+    <div className="flex justify-center items-center gap-2 mt-8">
       <div className="join">
-        {/* Previous button */}
         <button
-          className={`join-item btn btn-sm ${current === 1 ? 'btn-disabled' : ''}`}
-          onClick={() => handlePageChange(current - 1)}
-          disabled={current === 1 || isLoading}
-          aria-label="Previous page"
+          className="join-item btn btn-sm"
+          onClick={() => handlePageClick(pagination.current - 1)}
+          disabled={pagination.current === 1 || isLoading}
         >
           «
         </button>
-
-        {/* Page numbers */}
-        {pageNumbers.map((pageNum, index) => (
-          pageNum === '...' ? (
-            <span key={`dots-${index}`} className="join-item btn btn-sm btn-disabled">
+        
+        {generatePageNumbers().map((page, index) => (
+          page === '...' ? (
+            <span key={index} className="join-item btn btn-sm btn-disabled">
               ...
             </span>
           ) : (
             <button
-              key={pageNum}
+              key={page}
               className={`join-item btn btn-sm ${
-                pageNum === current ? 'btn-active' : ''
+                page === pagination.current ? 'btn-active' : ''
               }`}
-              onClick={() => handlePageChange(pageNum)}
+              onClick={() => handlePageClick(page)}
               disabled={isLoading}
             >
-              {pageNum}
+              {page}
             </button>
           )
         ))}
-
-        {/* Next button */}
+        
         <button
-          className={`join-item btn btn-sm ${current === total ? 'btn-disabled' : ''}`}
-          onClick={() => handlePageChange(current + 1)}
-          disabled={current === total || isLoading}
-          aria-label="Next page"
+          className="join-item btn btn-sm"
+          onClick={() => handlePageClick(pagination.current + 1)}
+          disabled={!pagination.hasMore || isLoading}
         >
           »
         </button>
+      </div>
+      
+      <div className="text-sm opacity-70 ml-4">
+        Page {pagination.current} of {pagination.total}
       </div>
     </div>
   );
