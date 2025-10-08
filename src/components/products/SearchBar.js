@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SearchBar({ onSearch, isLoading }) {
@@ -8,15 +8,15 @@ export default function SearchBar({ onSearch, isLoading }) {
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
 
-  // Debounced search function
-  const debouncedSearch = useCallback(() => {
+  // Proper debounced search without causing re-renders
+  const debouncedSearch = useCallback((term) => {
     const timer = setTimeout(() => {
-      onSearch(searchTerm);
+      onSearch(term);
       
       // Update URL with search parameter
       const params = new URLSearchParams(searchParams);
-      if (searchTerm) {
-        params.set('q', searchTerm);
+      if (term) {
+        params.set('q', term);
       } else {
         params.delete('q');
       }
@@ -26,13 +26,17 @@ export default function SearchBar({ onSearch, isLoading }) {
       router.replace(newUrl, { scroll: false });
     }, 300);
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, onSearch, router, searchParams]);
+    return timer;
+  }, [onSearch, router, searchParams]);
 
-  useEffect(() => {
-    const cleanup = debouncedSearch();
-    return cleanup;
-  }, [debouncedSearch]);
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Clear previous timeout and set new one
+    const timer = debouncedSearch(value);
+    return () => clearTimeout(timer);
+  };
 
   const handleClear = () => {
     setSearchTerm('');
@@ -49,7 +53,7 @@ export default function SearchBar({ onSearch, isLoading }) {
             placeholder="Search products..."
             className="input input-bordered flex-1"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleInputChange}
           />
           {searchTerm && (
             <button

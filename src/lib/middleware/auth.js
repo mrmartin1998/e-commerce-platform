@@ -5,9 +5,15 @@ import connectDB from '@/lib/db/mongoose';
 
 export async function verifyAuth(request) {
   try {
-    const token = request.headers.get('Authorization')?.replace('Bearer ', '');
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
+    }
     
-    if (!token) {
+    const token = authHeader.replace('Bearer ', '').trim();
+    
+    // Check if token is valid (not empty, null, or too short)
+    if (!token || token === 'null' || token === 'undefined' || token.length < 10) {
       return null;
     }
 
@@ -20,34 +26,23 @@ export async function verifyAuth(request) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Include all fields we need for profile
-    const user = await User.findById(decoded.userId)
-      .select('-password -refreshToken');
     
+    const user = await User.findById(decoded.userId);
     if (!user) {
       return null;
     }
 
     return user;
   } catch (error) {
-    // Keep only this critical error log
-    console.error('Auth error:', error);
+    // Silently handle auth errors - don't log for invalid/missing tokens
     return null;
   }
 }
 
-export function requireAuth(handler) {
-  return async function (request, context) {
-    const user = await verifyAuth(request);
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    request.user = user;
-    return handler(request, context);
-  };
-} 
+export async function requireAuth(request) {
+  const user = await verifyAuth(request);
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+  return user;
+}
