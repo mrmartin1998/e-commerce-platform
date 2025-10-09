@@ -1,33 +1,22 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FiSearch, FiX } from 'react-icons/fi';
 
 function SearchBarContent({ onSearch, isLoading }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
 
-  // Initialize search term from URL params
-  useEffect(() => {
-    const q = searchParams.get('q');
-    if (q) {
-      setSearchTerm(q);
-    }
-  }, [searchParams]);
-
-  // Debounce search input
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (onSearch) {
-        onSearch(searchTerm);
-      }
+  // Proper debounced search without causing re-renders
+  const debouncedSearch = useCallback((term) => {
+    const timer = setTimeout(() => {
+      onSearch(term);
       
       // Update URL with search parameter
       const params = new URLSearchParams(searchParams);
-      if (searchTerm) {
-        params.set('q', searchTerm);
+      if (term) {
+        params.set('q', term);
       } else {
         params.delete('q');
       }
@@ -35,16 +24,23 @@ function SearchBarContent({ onSearch, isLoading }) {
       // Update URL without page refresh
       const newUrl = params.toString() ? `?${params.toString()}` : '/products';
       router.replace(newUrl, { scroll: false });
-    }, 300); // 300ms delay
+    }, 300);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, onSearch, router, searchParams]);
+    return timer;
+  }, [onSearch, router, searchParams]);
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Clear previous timeout and set new one
+    const timer = debouncedSearch(value);
+    return () => clearTimeout(timer);
+  };
 
   const handleClear = () => {
     setSearchTerm('');
-    if (onSearch) {
-      onSearch('');
-    }
+    onSearch('');
     router.replace('/products', { scroll: false });
   };
 
@@ -52,23 +48,20 @@ function SearchBarContent({ onSearch, isLoading }) {
     <div className="relative">
       <div className="form-control">
         <div className="input-group">
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5">
-            <FiSearch />
-          </div>
           <input
             type="text"
             placeholder="Search products..."
-            className="input input-bordered flex-1 pl-10 pr-10"
+            className="input input-bordered flex-1"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleInputChange}
           />
           {searchTerm && (
             <button
               onClick={handleClear}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="btn btn-ghost btn-sm"
               aria-label="Clear search"
             >
-              <FiX className="w-5 h-5" />
+              ✕
             </button>
           )}
           <div className="btn btn-square">
