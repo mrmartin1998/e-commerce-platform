@@ -1,11 +1,12 @@
 "use client";
 
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/store/cartStore';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CartItemSkeleton, EmptyState, ErrorState } from '@/components/ui/SkeletonLoader';
 
 export default function CartDropdown({ isOpen, onClose }) {
-  const { items, loading, error, removeItem, updateQuantity } = useCartStore();
+  const { items, loading, error, removeItem, updateQuantity } = useCart();
 
   const subtotal = items.reduce((sum, item) => 
     sum + (item.price * item.quantity), 0
@@ -20,15 +21,40 @@ export default function CartDropdown({ isOpen, onClose }) {
         <button onClick={onClose} className="btn btn-ghost btn-sm">×</button>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center p-4">
-          <span className="loading loading-spinner"></span>
+      {/* Loading State */}
+      {loading && (
+        <div className="space-y-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CartItemSkeleton key={i} />
+          ))}
         </div>
-      ) : error ? (
-        <div className="text-error text-center p-4">{error}</div>
-      ) : items.length === 0 ? (
-        <div className="text-center p-4">Your cart is empty</div>
-      ) : (
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <ErrorState
+          title="Cart Error"
+          message={error}
+          onRetry={() => window.location.reload()}
+        />
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && items.length === 0 && (
+        <EmptyState
+          icon="🛒"
+          title="Your cart is empty"
+          message="Add some products to get started"
+          actionText="Shop Now"
+          onAction={() => {
+            onClose();
+            window.location.href = '/products';
+          }}
+        />
+      )}
+
+      {/* Cart Items */}
+      {!loading && !error && items.length > 0 && (
         <>
           <div className="max-h-96 overflow-auto space-y-4">
             {items.map((item) => (
@@ -48,19 +74,27 @@ export default function CartDropdown({ isOpen, onClose }) {
                     <button 
                       className="btn btn-xs"
                       onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                    >-</button>
+                      disabled={item.quantity <= 1 || loading}
+                    >
+                      -
+                    </button>
                     <span>{item.quantity}</span>
                     <button 
                       className="btn btn-xs"
                       onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                    >+</button>
+                      disabled={loading}
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
                 <button 
                   onClick={() => removeItem(item.productId)}
                   className="btn btn-ghost btn-sm"
-                >×</button>
+                  disabled={loading}
+                >
+                  ×
+                </button>
               </div>
             ))}
           </div>
@@ -77,11 +111,15 @@ export default function CartDropdown({ isOpen, onClose }) {
               className="btn btn-primary w-full"
               onClick={onClose}
             >
-              Checkout
+              {loading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                'Checkout'
+              )}
             </Link>
           </div>
         </>
       )}
     </div>
   );
-} 
+}
