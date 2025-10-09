@@ -6,11 +6,19 @@ import ProductListItem from '@/components/products/ProductListItem';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilters from '@/components/products/ProductFilters';
 import Pagination from '@/components/products/Pagination';
+import { 
+  ProductCardSkeleton, 
+  ProductListSkeleton, 
+  LoadingSpinner,
+  EmptyState,
+  ErrorState 
+} from '@/components/ui/SkeletonLoader';
 
 export default function ProductsPage() {
   const [viewType, setViewType] = useState('grid');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({});
   const [pagination, setPagination] = useState({ current: 1, total: 1, hasMore: false });
@@ -18,6 +26,7 @@ export default function ProductsPage() {
   // Memoized fetch function to prevent infinite re-renders
   const fetchProducts = useCallback(async (search = '', currentFilters = {}, page = 1) => {
     setLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams();
       if (search) params.set('q', search);
@@ -43,6 +52,7 @@ export default function ProductsPage() {
       setPagination(data.pagination || { current: 1, total: 1, hasMore: false });
     } catch (error) {
       console.error('Error fetching products:', error);
+      setError('Failed to load products. Please try again.');
       setProducts([]);
     } finally {
       setLoading(false);
@@ -71,6 +81,11 @@ export default function ProductsPage() {
     fetchProducts(searchTerm, filters, page);
   }, [fetchProducts, searchTerm, filters]);
 
+  // Retry fetching products in case of error
+  const retryFetch = () => {
+    fetchProducts(searchTerm, filters, pagination.current);
+  };
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col lg:flex-row gap-6">
@@ -95,6 +110,7 @@ export default function ProductsPage() {
                   className={`btn join-item btn-sm ${viewType === 'grid' ? 'btn-active' : ''}`}
                   onClick={() => setViewType('grid')}
                   aria-label="Grid view"
+                  disabled={loading}
                 >
                   Grid
                 </button>
@@ -102,6 +118,7 @@ export default function ProductsPage() {
                   className={`btn join-item btn-sm ${viewType === 'list' ? 'btn-active' : ''}`}
                   onClick={() => setViewType('list')}
                   aria-label="List view"
+                  disabled={loading}
                 >
                   List
                 </button>
@@ -109,43 +126,69 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center py-8">
-              <span className="loading loading-spinner loading-lg"></span>
-            </div>
+          {/* Error State */}
+          {error && !loading && (
+            <ErrorState 
+              title="Failed to Load Products"
+              message={error}
+              onRetry={retryFetch}
+            />
           )}
 
-          {/* Products Grid/List */}
-          {!loading && (
+          {/* Loading State with Skeletons */}
+          {loading && (
             <>
               {viewType === 'grid' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                  {products?.map((product) => (
-                    <ProductCard key={product._id} product={product} />
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <ProductCardSkeleton key={i} />
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
-                  {products?.map((product) => (
-                    <ProductListItem key={product._id} product={product} />
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <ProductListSkeleton key={i} />
                   ))}
                 </div>
               )}
+            </>
+          )}
 
-              {/* Empty State */}
-              {products?.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-lg opacity-60">No products found</p>
-                </div>
+          {/* Products Display */}
+          {!loading && !error && (
+            <>
+              {products?.length > 0 ? (
+                <>
+                  {viewType === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                      {products.map((product) => (
+                        <ProductCard key={product._id} product={product} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      {products.map((product) => (
+                        <ProductListItem key={product._id} product={product} />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Pagination */}
+                  <Pagination 
+                    pagination={pagination} 
+                    onPageChange={handlePageChange} 
+                    isLoading={loading} 
+                  />
+                </>
+              ) : (
+                <EmptyState 
+                  icon="🔍"
+                  title="No products found"
+                  message={searchTerm ? `No products match "${searchTerm}"` : "No products available at the moment"}
+                  actionText={searchTerm ? "Clear Search" : "Refresh"}
+                  onAction={searchTerm ? () => handleSearch('') : retryFetch}
+                />
               )}
-
-              {/* Pagination */}
-              <Pagination 
-                pagination={pagination} 
-                onPageChange={handlePageChange} 
-                isLoading={loading} 
-              />
             </>
           )}
         </div>
