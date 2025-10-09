@@ -1,11 +1,11 @@
 "use client";
 
-import { useCartStore } from '@/store/cartStore';
+import { useCart } from '@/store/cartStore';
 import { useEffect, useState, useRef } from 'react';
 import CartDropdown from './CartDropdown';
 
 export default function CartIcon() {
-  const { items, fetchCart, loading, error } = useCartStore();
+  const { items, fetchCart, loading, error } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -30,7 +30,11 @@ export default function CartIcon() {
       {loading ? (
         <span className="loading loading-spinner loading-sm"></span>
       ) : error ? (
-        <span className="text-error" title={error}>!</span>
+        <div className="tooltip tooltip-bottom" data-tip={error}>
+          <span className="text-error cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+            ⚠️
+          </span>
+        </div>
       ) : (
         <>
           {itemCount > 0 && (
@@ -63,4 +67,4 @@ export default function CartIcon() {
       )}
     </div>
   );
-} 
+}
