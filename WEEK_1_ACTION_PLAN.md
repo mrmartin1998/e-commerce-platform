@@ -136,11 +136,11 @@ Using your issue templates, create GitHub issues for remaining tasks:
 **Work in**: `feature/cart-persistence-enhancement` branch
 
 **Implementation**:
-- [ ] Add localStorage fallback in cart store
-- [ ] Implement cart sync between localStorage and server
-- [ ] Handle cart merge on user login
-- [ ] Add cart persistence indicator in UI
-- [ ] Test cart behavior logged in/out
+- [x] Add localStorage fallback in cart store
+- [x] Implement cart sync between localStorage and server
+- [x] Handle cart merge on user login
+- [x] Add cart persistence indicator in UI
+- [x] Test cart behavior logged in/out
 
 **Files to Modify**:
 - `src/store/cartStore.js` - Add localStorage integration
@@ -150,11 +150,11 @@ Using your issue templates, create GitHub issues for remaining tasks:
 **Work in**: `feature/loading-error-states` branch
 
 **Implementation**:
-- [ ] Create skeleton loader components
-- [ ] Add loading states to products and cart
-- [ ] Improve error boundary handling
-- [ ] Create consistent empty states
-- [ ] Test all loading/error scenarios
+- [x] Create skeleton loader components
+- [x] Add loading states to products and cart
+- [x] Improve error boundary handling
+- [x] Create consistent empty states
+- [x] Test all loading/error scenarios
 
 **Files to Create/Modify**:
 - Create `src/components/ui/SkeletonLoader.js`
