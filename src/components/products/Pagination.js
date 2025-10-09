@@ -25,21 +25,21 @@ export default function Pagination({ pagination, onPageChange, isLoading }) {
   return (
     <div className="flex justify-center items-center gap-2 mt-8">
       <button
-        className="btn btn-sm"
         onClick={() => handlePageClick(pagination.current - 1)}
-        disabled={pagination.current === 1 || isLoading}
+        disabled={pagination.current <= 1 || isLoading}
+        className="btn btn-outline btn-sm"
       >
         Previous
       </button>
       
-      <span className="px-4 py-2">
+      <span className="text-sm">
         Page {pagination.current} of {pagination.total}
       </span>
       
       <button
-        className="btn btn-sm"
         onClick={() => handlePageClick(pagination.current + 1)}
-        disabled={!pagination.hasMore || isLoading}
+        disabled={pagination.current >= pagination.total || isLoading}
+        className="btn btn-outline btn-sm"
       >
         Next
       </button>

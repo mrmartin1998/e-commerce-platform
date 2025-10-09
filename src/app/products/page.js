@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import ProductCard from '@/components/products/ProductCard';
 import ProductListItem from '@/components/products/ProductListItem';
 import SearchBar from '@/components/products/SearchBar';
@@ -85,7 +85,11 @@ export default function ProductsPage() {
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
             <div className="flex items-center gap-4">
-              <SearchBar onSearch={handleSearch} isLoading={loading} />
+              <Suspense fallback={
+                <div className="input input-bordered w-64 h-12 animate-pulse bg-base-200"></div>
+              }>
+                <SearchBar onSearch={handleSearch} isLoading={loading} />
+              </Suspense>
               <div className="join">
                 <button 
                   className={`btn join-item btn-sm ${viewType === 'grid' ? 'btn-active' : ''}`}
