@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useCart } from '@/store/cartStore';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { syncCartWithServer } = useCart();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -35,6 +37,9 @@ export default function LoginPage() {
 
       // Store the token in localStorage
       localStorage.setItem('token', data.token);
+      
+      // Sync localStorage cart with server cart
+      await syncCartWithServer();
       
       // Redirect to products page
       window.location.href = '/products';
