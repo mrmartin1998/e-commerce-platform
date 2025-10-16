@@ -1,48 +1,58 @@
-import jwt from 'jsonwebtoken';
-import { User, TokenBlacklist } from '@/lib/models';
 import { NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+import { User } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 
-export async function verifyAuth(request) {
-  try {
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
+export function requireAuth(handler) {
+  return async (request, context) => {
+    try {
+      // Extract token from Authorization header
+      const authHeader = request.headers.get('Authorization');
+      const token = authHeader && authHeader.startsWith('Bearer ') 
+        ? authHeader.split(' ')[1] 
+        : null;
+      
+      // Check for token in cookie as fallback
+      const cookies = request.cookies;
+      const cookieToken = cookies.get('token')?.value;
+      
+      // Use either token source
+      const authToken = token || cookieToken;
+
+      if (!authToken) {
+        return NextResponse.json(
+          { error: 'Authentication required' },
+          { status: 401 }
+        );
+      }
+
+      // Verify token
+      const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
+      
+      // Connect to database
+      await connectDB();
+      
+      // Get user from database
+      const user = await User.findById(decoded.userId).lean();
+      
+      if (!user) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 401 }
+        );
+      }
+
+      // Add user to request
+      request.user = user;
+      
+      // Continue to handler
+      return handler(request, context);
+    } catch (error) {
+      console.error('Auth middleware error:', error);
+      return NextResponse.json(
+        { error: 'Authentication failed' },
+        { status: 401 }
+      );
     }
-    
-    const token = authHeader.replace('Bearer ', '').trim();
-    
-    // Check if token is valid (not empty, null, or too short)
-    if (!token || token === 'null' || token === 'undefined' || token.length < 10) {
-      return null;
-    }
-
-    await connectDB(); // Single connection point
-
-    // Check if token is blacklisted
-    const blacklisted = await TokenBlacklist.findOne({ token });
-    if (blacklisted) {
-      return null;
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  } catch (error) {
-    // Silently handle auth errors - don't log for invalid/missing tokens
-    return null;
-  }
-}
-
-export async function requireAuth(request) {
-  const user = await verifyAuth(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-  }
-  return user;
+  };
 }
