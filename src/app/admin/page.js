@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
 import { StatCardSkeleton, TableSkeleton, ErrorState } from '@/components/ui/SkeletonLoader';
+import SalesChart from '@/components/admin/dashboard/charts/SalesChart';
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -109,6 +110,11 @@ export default function AdminDashboard() {
             </div>
           </>
         )}
+      </div>
+
+      {/* Sales Chart Section */}
+      <div className="mb-8">
+        <SalesChart />
       </div>
 
       {/* Quick Actions */}
