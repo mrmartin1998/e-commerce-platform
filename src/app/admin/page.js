@@ -122,6 +122,9 @@ export default function AdminDashboard() {
         <Link href="/admin/products/add" className="btn btn-primary">
           Add New Product
         </Link>
+        <Link href="/admin/analytics" className="btn btn-secondary">
+          📊 Analytics Dashboard
+        </Link>
         <Link href="/admin/orders" className="btn btn-outline">
           View All Orders
         </Link>
