@@ -102,6 +102,13 @@ export default function AdminProductsPage() {
                       fill
                       className="object-cover rounded"
                     />
+                    {product.images?.length > 1 && (
+                      <div className="absolute -top-1 -right-1">
+                        <span className="badge badge-primary badge-xs">
+                          +{product.images.length - 1}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </td>
                 <td>{product.name}</td>
