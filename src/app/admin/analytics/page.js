@@ -4,9 +4,11 @@ import { useState } from 'react';
 import SalesChart from '@/components/admin/dashboard/charts/SalesChart';
 import InventoryAnalytics from '@/components/admin/dashboard/InventoryAnalytics';
 import CustomerInsights from '@/components/admin/dashboard/CustomerInsights';
+import { exportSalesData, exportCustomerData, exportInventoryData } from '@/lib/utils/exportUtils';
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [exporting, setExporting] = useState(false);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
@@ -96,6 +98,90 @@ export default function AnalyticsPage() {
     }
   };
 
+  const handleExportAll = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Fetch all analytics data
+      const [salesResponse, customerResponse, inventoryResponse] = await Promise.all([
+        fetch('/api/admin/statistics', { headers: { Authorization: `Bearer ${token}` }}),
+        fetch('/api/admin/analytics/customers', { headers: { Authorization: `Bearer ${token}` }}),
+        fetch('/api/admin/analytics/inventory', { headers: { Authorization: `Bearer ${token}` }})
+      ]);
+
+      const salesData = await salesResponse.json();
+      const customerData = await customerResponse.json();
+      const inventoryData = await inventoryResponse.json();
+
+      // Export all data
+      if (salesData.revenueByMonth) {
+        await exportSalesData(salesData.revenueByMonth);
+      }
+      
+      if (customerData.customers) {
+        await exportCustomerData(customerData.customers);
+      }
+      
+      if (inventoryData.products) {
+        await exportInventoryData(inventoryData.products);
+      }
+
+      // Show success message
+      alert('All analytics data exported successfully!');
+      
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export data. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleTabExport = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      switch (activeTab) {
+        case 'sales':
+          const salesResponse = await fetch('/api/admin/statistics', { 
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const salesData = await salesResponse.json();
+          if (salesData.revenueByMonth) {
+            await exportSalesData(salesData.revenueByMonth);
+          }
+          break;
+          
+        case 'customers':
+          const customerResponse = await fetch('/api/admin/analytics/customers', { 
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const customerData = await customerResponse.json();
+          if (customerData.customers) {
+            await exportCustomerData(customerData.customers);
+          }
+          break;
+          
+        case 'inventory':
+          const inventoryResponse = await fetch('/api/admin/analytics/inventory', { 
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const inventoryData = await inventoryResponse.json();
+          if (inventoryData.products) {
+            await exportInventoryData(inventoryData.products);
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export data. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       {/* Header */}
@@ -107,7 +193,7 @@ export default function AnalyticsPage() {
           </p>
         </div>
         
-        {/* Date Range Selector */}
+        {/* Enhanced Export Options */}
         <div className="flex gap-2 mt-4 sm:mt-0">
           <select className="select select-bordered select-sm">
             <option>Last 7 days</option>
@@ -115,9 +201,34 @@ export default function AnalyticsPage() {
             <option>Last 3 months</option>
             <option>Last 12 months</option>
           </select>
-          <button className="btn btn-primary btn-sm">
-            📊 Export Report
-          </button>
+          
+          <div className="dropdown dropdown-end">
+            <div tabIndex={0} role="button" className="btn btn-primary btn-sm">
+              📊 Export Data
+            </div>
+            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-64 p-2 shadow">
+              <li>
+                <button 
+                  onClick={handleTabExport}
+                  disabled={exporting}
+                  className="flex justify-between"
+                >
+                  <span>Export Current Tab</span>
+                  {exporting && <span className="loading loading-spinner loading-xs"></span>}
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={handleExportAll}
+                  disabled={exporting}
+                  className="flex justify-between"
+                >
+                  <span>Export All Analytics</span>
+                  {exporting && <span className="loading loading-spinner loading-xs"></span>}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

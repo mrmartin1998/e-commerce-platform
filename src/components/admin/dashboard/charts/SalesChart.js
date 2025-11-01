@@ -3,12 +3,14 @@
 import { Line } from 'react-chartjs-2';
 import { useState, useEffect } from 'react';
 import { defaultChartOptions, formatCurrency } from '@/lib/utils/chartConfig';
+import { exportSalesData } from '@/lib/utils/exportUtils';
 
 export default function SalesChart({ timeRange = '30' }) {
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [themeColors, setThemeColors] = useState(null);
+  const [rawData, setRawData] = useState(null); // Store raw data for export
 
   // Get actual theme colors from computed styles and convert to RGB
   useEffect(() => {
@@ -91,6 +93,9 @@ export default function SalesChart({ timeRange = '30' }) {
       // Process revenueByMonth data for chart
       const monthlyData = data.revenueByMonth || [];
       
+      // Store raw data for export
+      setRawData(monthlyData);
+      
       // Sort by date and prepare chart data
       const sortedData = monthlyData.sort((a, b) => {
         const dateA = new Date(a._id.year, a._id.month - 1);
@@ -134,6 +139,21 @@ export default function SalesChart({ timeRange = '30' }) {
       setError('Failed to load sales data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle export
+  const handleExport = async () => {
+    if (!rawData || rawData.length === 0) {
+      alert('No data available to export');
+      return;
+    }
+
+    try {
+      await exportSalesData(rawData);
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Failed to export data. Please try again.');
     }
   };
 
@@ -267,6 +287,13 @@ export default function SalesChart({ timeRange = '30' }) {
     <div className="bg-base-100 p-6 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Sales Trends</h3>
+        <button 
+          className="btn btn-sm btn-outline"
+          onClick={handleExport}
+          disabled={loading || !rawData}
+        >
+          📊 Export CSV
+        </button>
       </div>
       <div className="h-64 w-full">
         <Line data={chartData} options={chartOptions} />
