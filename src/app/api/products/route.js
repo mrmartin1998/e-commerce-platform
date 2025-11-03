@@ -55,10 +55,15 @@ export async function GET(request) {
       .sort(sortObj)
       .skip(skip)
       .limit(limit)
-      .select('-__v');
+      .select('-__v')
+      .lean(); // Add .lean() to get plain objects with all fields
     
     const total = await Product.countDocuments(criteria);
     const totalPages = Math.ceil(total / limit);
+    
+    // Debug: Log what we're actually getting from database
+    console.log('API: First product from DB:', products[0]);
+    console.log('API: First product images:', products[0]?.images);
     
     return NextResponse.json({ 
       products,

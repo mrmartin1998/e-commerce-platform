@@ -35,7 +35,7 @@ export const GET = async function(request, context) {
     const params = await context.params;
     const { id } = params;
     
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).lean(); // Add .lean() here too
     
     if (!product) {
       return NextResponse.json(
@@ -43,6 +43,8 @@ export const GET = async function(request, context) {
         { status: 404 }
       );
     }
+
+    console.log('Product API - Images for product:', product.name, product.images); // Debug log
 
     return NextResponse.json({ product });
     

@@ -21,7 +21,7 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
     async function fetchCategories() {
       try {
         setCategoriesLoading(true);
-        const response = await fetch('/api/admin/categories');
+        const response = await fetch('/api/categories'); // Change from /api/admin/categories
         const data = await response.json();
         
         if (data.error) {

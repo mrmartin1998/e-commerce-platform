@@ -21,6 +21,7 @@ export default function ProductDetailPage() {
   const [error, setError] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (params?.id) {
@@ -32,14 +33,27 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart({
-        productId: product._id,
-        name: product.name,
-        price: product.price,
-        image: product.images?.[0]?.url || '/images/placeholder.png',
-        quantity
-      });
+      addToCart(product._id, quantity); // Fix: Call with productId and quantity
     }
+  };
+
+  // Get the image URL with fallback
+  const getImageUrl = (imageObj) => {
+    if (!imageObj || !imageObj.url) return '/images/placeholder.png';
+    
+    // If it's already a data URL (base64), return as is
+    if (imageObj.url.startsWith('data:')) return imageObj.url;
+    
+    // If it's a regular URL, return as is
+    if (imageObj.url.startsWith('http')) return imageObj.url;
+    
+    // Otherwise assume it's a path and add base URL if needed
+    return imageObj.url.startsWith('/') ? imageObj.url : `/${imageObj.url}`;
+  };
+
+  // Handle image load errors
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   if (loading) {
@@ -60,7 +74,7 @@ export default function ProductDetailPage() {
 
   const productImages = product.images && product.images.length > 0 
     ? product.images 
-    : [{ url: '/images/placeholder.png' }];
+    : [{ url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgZmlsbD0iIzM3NDE1MSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIwMCIgeT0iMjAwIiBzdHlsZT0iZmlsbDojOWNhM2FmO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjI1cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+' }];
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -28,6 +28,12 @@ export default function AdminProductsPage() {
           throw new Error(data.error);
         }
         
+        // Debug: Check what images look like
+        console.log('Products with images:', data.products.map(p => ({
+          name: p.name,
+          images: p.images
+        })));
+        
         setProducts(data.products);
       } catch (err) {
         console.error('Products fetch error:', err);
