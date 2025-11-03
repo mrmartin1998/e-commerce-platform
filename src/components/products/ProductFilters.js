@@ -13,6 +13,42 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Fetch categories
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        setCategoriesLoading(true);
+        const response = await fetch('/api/admin/categories');
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        // Only show active categories with products
+        const activeCategories = data.categories.filter(cat => 
+          cat.isActive && (cat.metadata?.productCount > 0)
+        );
+        setCategories(activeCategories);
+      } catch (err) {
+        console.error('Categories fetch error:', err);
+        // Fall back to default categories if API fails
+        setCategories([
+          { slug: 'electronics', name: 'Electronics' },
+          { slug: 'clothing', name: 'Clothing' },
+          { slug: 'books', name: 'Books' },
+          { slug: 'home', name: 'Home & Kitchen' }
+        ]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   // Initialize from URL params
   useEffect(() => {
@@ -48,6 +84,28 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
     }
   };
 
+  // Build hierarchical category options
+  const buildCategoryOptions = () => {
+    const topLevel = categories.filter(cat => !cat.parentCategory);
+    const children = categories.filter(cat => cat.parentCategory);
+    
+    const options = [];
+    
+    topLevel.forEach(parent => {
+      options.push(parent);
+      
+      // Add children
+      const parentChildren = children.filter(child => 
+        child.parentCategory?._id === parent._id
+      );
+      parentChildren.forEach(child => {
+        options.push({ ...child, isChild: true });
+      });
+    });
+    
+    return options;
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
@@ -58,18 +116,25 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
           <label className="label">
             <span className="label-text">Category</span>
           </label>
-          <select 
-            className="select select-bordered"
-            value={filters.category}
-            onChange={(e) => handleFilterChange({ category: e.target.value })}
-            disabled={isLoading}
-          >
-            <option value="">All Categories</option>
-            <option value="electronics">Electronics</option>
-            <option value="clothing">Clothing</option>
-            <option value="books">Books</option>
-            <option value="home">Home & Garden</option>
-          </select>
+          {categoriesLoading ? (
+            <div className="skeleton h-12 w-full"></div>
+          ) : (
+            <select 
+              className="select select-bordered"
+              value={filters.category}
+              onChange={(e) => handleFilterChange({ category: e.target.value })}
+              disabled={isLoading}
+            >
+              <option value="">All Categories</option>
+              {buildCategoryOptions().map((category) => (
+                <option key={category._id || category.slug} value={category.slug}>
+                  {category.isChild ? '  ↳ ' : ''}{category.name}
+                  {category.metadata?.icon && ` ${category.metadata.icon}`}
+                  {category.metadata?.productCount && ` (${category.metadata.productCount})`}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Price Range */}

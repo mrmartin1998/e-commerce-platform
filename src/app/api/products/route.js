@@ -84,26 +84,55 @@ export const POST = requireAdmin(async function(request) {
     
     const productData = await request.json();
     
-    // Basic validation
-    if (!productData.name || !productData.price) {
+    // Validate required fields
+    if (!productData.name || !productData.price || !productData.category) {
       return NextResponse.json(
-        { error: 'Name and price are required' },
+        { error: 'Name, price, and category are required' },
         { status: 400 }
       );
     }
 
+    // Verify category exists
+    const { Category } = require('@/lib/models');
+    const category = await Category.findOne({ 
+      slug: productData.category,
+      isActive: true 
+    });
+    
+    if (!category) {
+      return NextResponse.json(
+        { error: 'Invalid category selected' },
+        { status: 400 }
+      );
+    }
+
+    // Use default threshold if not provided
+    if (!productData.lowStockThreshold) {
+      productData.lowStockThreshold = 10;
+    }
+
     const product = await Product.create({
       ...productData,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdBy: request.user._id
     });
 
-    return NextResponse.json({ product }, { status: 201 });
+    return NextResponse.json({ 
+      product: product.toObject(),
+      message: 'Product created successfully'
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Product creation error:', error);
+    
+    if (error.code === 11000) {
+      return NextResponse.json(
+        { error: 'Product with this name already exists' },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to create product' },
       { status: 500 }
     );
   }

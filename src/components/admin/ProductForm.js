@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ImageManager from './ImageManager';
@@ -15,10 +15,49 @@ export default function ProductForm({ initialData, isEditing }) {
     price: initialData?.price || '',
     category: initialData?.category || '',
     stock: initialData?.stock || '',
+    lowStockThreshold: initialData?.lowStockThreshold || 10,
     status: initialData?.status || 'draft',
     images: initialData?.images || [],
   });
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        setCategoriesLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/admin/categories', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        setCategories(data.categories);
+      } catch (err) {
+        console.error('Categories fetch error:', err);
+        // If categories fail to load, fall back to default options
+        setCategories([
+          { _id: 'electronics', name: 'Electronics', slug: 'electronics' },
+          { _id: 'clothing', name: 'Clothing', slug: 'clothing' },
+          { _id: 'books', name: 'Books', slug: 'books' },
+          { _id: 'home', name: 'Home & Kitchen', slug: 'home' }
+        ]);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,6 +101,38 @@ export default function ProductForm({ initialData, isEditing }) {
     }));
   };
 
+  // Get selected category details for threshold display
+  const selectedCategory = categories.find(cat => 
+    cat.slug === formData.category || cat._id === formData.category
+  );
+
+  // Update threshold when category changes (if product doesn't have custom threshold)
+  const handleCategoryChange = (categorySlug) => {
+    setFormData(prev => ({ ...prev, category: categorySlug }));
+  };
+
+  // Build hierarchical category options
+  const buildCategoryOptions = () => {
+    const topLevel = categories.filter(cat => !cat.parentCategory);
+    const children = categories.filter(cat => cat.parentCategory);
+    
+    const options = [];
+    
+    topLevel.forEach(parent => {
+      options.push(parent);
+      
+      // Add children indented
+      const parentChildren = children.filter(child => 
+        child.parentCategory._id === parent._id
+      );
+      parentChildren.forEach(child => {
+        options.push({ ...child, isChild: true });
+      });
+    });
+    
+    return options;
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto p-6">
       <h2 className="text-2xl font-bold">
@@ -87,14 +158,37 @@ export default function ProductForm({ initialData, isEditing }) {
         </div>
 
         <div className="form-control">
-          <label className="label">Category</label>
-          <input
-            type="text"
-            className="input input-bordered"
-            value={formData.category}
-            onChange={(e) => setFormData({...formData, category: e.target.value})}
-            required
-          />
+          <label className="label">
+            <span className="label-text">Category</span>
+          </label>
+          {categoriesLoading ? (
+            <div className="skeleton h-12 w-full"></div>
+          ) : (
+            <>
+              <select
+                className="select select-bordered"
+                value={formData.category}
+                onChange={(e) => handleCategoryChange(e.target.value)}
+                required
+              >
+                <option value="">Select a category</option>
+                {buildCategoryOptions().map((category) => (
+                  <option key={category._id} value={category.slug}>
+                    {category.isChild ? '  ↳ ' : ''}{category.name}
+                    {category.metadata?.icon && ` ${category.metadata.icon}`}
+                  </option>
+                ))}
+              </select>
+              <label className="label">
+                <span className="label-text-alt">
+                  {categories.length} categories available • 
+                  <a href="/admin/categories" className="link link-primary ml-1">
+                    Manage Categories
+                  </a>
+                </span>
+              </label>
+            </>
+          )}
         </div>
 
         <div className="form-control">
@@ -118,6 +212,27 @@ export default function ProductForm({ initialData, isEditing }) {
             onChange={(e) => setFormData({...formData, stock: e.target.value})}
             required
           />
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text">Low Stock Threshold</span>
+            <span className="label-text-alt">Alert when stock hits this level</span>
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="input input-bordered"
+            value={formData.lowStockThreshold}
+            onChange={(e) => setFormData({...formData, lowStockThreshold: parseInt(e.target.value) || 0})}
+            placeholder="10"
+          />
+          <label className="label">
+            <span className="label-text-alt">
+              Current stock: {formData.stock || 0} | 
+              {formData.stock <= formData.lowStockThreshold ? ' ⚠️ Low stock alert!' : ' ✅ Stock OK'}
+            </span>
+          </label>
         </div>
 
         <div className="form-control md:col-span-2">
@@ -165,7 +280,7 @@ export default function ProductForm({ initialData, isEditing }) {
         <button 
           type="submit" 
           className={`btn btn-primary ${loading ? 'loading' : ''}`}
-          disabled={loading}
+          disabled={loading || categoriesLoading}
         >
           {isEditing ? 'Update Product' : 'Create Product'}
         </button>

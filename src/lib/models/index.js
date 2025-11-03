@@ -11,4 +11,5 @@ export const Product = mongoose.models.Product || mongoose.model('Product', prod
 export const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 export const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
 export const TokenBlacklist = mongoose.models.TokenBlacklist || 
-  mongoose.model('TokenBlacklist', tokenBlacklistSchema); 
+  mongoose.model('TokenBlacklist', tokenBlacklistSchema);
+export { default as Category } from './Category';

@@ -112,6 +112,7 @@ export default function InventoryAnalytics() {
                   <th>Product</th>
                   <th>Category</th>
                   <th>Stock Level</th>
+                  <th>Threshold</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -121,11 +122,12 @@ export default function InventoryAnalytics() {
                     <td>{product.name}</td>
                     <td>{product.category || 'Uncategorized'}</td>
                     <td>{product.stock}</td>
+                    <td>{product.threshold}</td>
                     <td>
                       <span className={`badge ${
                         product.stock === 0 ? 'badge-error' : 'badge-warning'
                       }`}>
-                        {product.stock === 0 ? 'Out of Stock' : 'Low Stock'}
+                        {product.stock === 0 ? 'Out of Stock' : `Low Stock (≤${product.threshold})`}
                       </span>
                     </td>
                   </tr>

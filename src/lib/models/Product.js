@@ -28,6 +28,11 @@ const productSchema = new Schema({
     required: true,
     min: 0
   },
+  lowStockThreshold: {
+    type: Number,
+    default: 10, // Default warning when stock hits 10 or below
+    min: 0
+  },
   images: [{
     url: {
       type: String,
