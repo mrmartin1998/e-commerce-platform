@@ -41,10 +41,11 @@ git checkout -b feature/new-feature-name
 
 ### 🛍️ Customer Experience
 - **🔐 Secure Authentication System**
-  - JWT-based login/register with bcrypt password hashing
+  - JWT-based login/register with bcrypt password hashing (7-day token expiration)
   - Protected routes with middleware authentication
   - Session persistence and automatic token validation
   - Secure password reset flow
+  - Persistent login sessions across browser restarts
 
 - **🛒 Complete Shopping Experience**
   - Product browsing with professional grid/list layouts
@@ -95,7 +96,7 @@ git checkout -b feature/new-feature-name
 ### Backend & Database
 - **🚀 Next.js API Routes** - Serverless architecture with middleware
 - **🍃 MongoDB + Mongoose** - Document database with professional schema design
-- **🔒 JWT Authentication** - Secure token-based auth with refresh mechanisms
+- **🔒 JWT Authentication** - Secure token-based auth (7-day session duration)
 - **🛡️ Input Validation** - Comprehensive data validation and sanitization
 
 ### Payment & Integration
