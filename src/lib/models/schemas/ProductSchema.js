@@ -26,12 +26,22 @@ const productSchema = new mongoose.Schema({
     index: true
   },
   images: [{
-    url: String,
-    alt: String
+    url: {
+      type: String,
+      required: true
+    },
+    name: String,
+    size: Number,
+    type: String
   }],
   stock: {
     type: Number,
     required: true,
+    min: 0
+  },
+  lowStockThreshold: {
+    type: Number,
+    default: 10, // Default warning when stock hits 10 or below
     min: 0
   },
   ratings: [{
@@ -80,4 +90,4 @@ productSchema.index({
   tags: 'text'
 });
 
-module.exports = productSchema; 
+module.exports = productSchema;

@@ -49,13 +49,16 @@ export const POST = requireAuth(async function(request) {
 
     await cart.save();
 
-    // Format response
+    // Populate cart with product details for proper response
+    await cart.populate('items.productId', 'name images price');
+
+    // Format response with proper image handling
     const items = cart.items.map(item => ({
-      productId: item.productId,
+      productId: item.productId._id,
       quantity: item.quantity,
       price: item.price,
-      name: product.name,
-      image: product.images?.[0]?.url || null
+      name: item.productId.name,
+      image: item.productId.images?.[0]?.url || '/images/placeholder.png' // Fix: Proper image handling
     }));
 
     return NextResponse.json({ items });
@@ -67,4 +70,4 @@ export const POST = requireAuth(async function(request) {
       { status: 500 }
     );
   }
-}); 
+});

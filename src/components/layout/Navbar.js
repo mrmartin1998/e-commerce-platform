@@ -131,9 +131,11 @@ export default function Navbar() {
               {user?.isAdmin && (
                 <>
                   <div className="divider my-0">Admin</div>
-                  <li><Link href="/admin" onClick={toggleProfileMenu}>Admin</Link></li>
+                  <li><Link href="/admin" onClick={toggleProfileMenu}>Admin Dashboard</Link></li>
                   <li><Link href="/admin/products" onClick={toggleProfileMenu}>Manage Products</Link></li>
+                  <li><Link href="/admin/categories" onClick={toggleProfileMenu}>Manage Categories</Link></li>
                   <li><Link href="/admin/orders" onClick={toggleProfileMenu}>Manage Orders</Link></li>
+                  <li><Link href="/admin/analytics" onClick={toggleProfileMenu}>Analytics</Link></li>
                 </>
               )}
               
@@ -146,4 +148,4 @@ export default function Navbar() {
       </div>
     </div>
   );
-} 
+}

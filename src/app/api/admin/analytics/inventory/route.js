@@ -13,15 +13,15 @@ export const GET = requireAdmin(async function(request) {
       .populate('items.productId')
       .sort({ createdAt: -1 });
 
-    // Calculate overview metrics
+    // Calculate overview metrics using custom thresholds
     const overview = {
       totalProducts: products.length,
-      lowStockItems: products.filter(p => p.stock <= 10).length,
+      lowStockItems: products.filter(p => p.stock <= (p.lowStockThreshold || 10)).length,
       outOfStockItems: products.filter(p => p.stock === 0).length,
       totalStockValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0)
     };
 
-    // Calculate stock levels by category
+    // Calculate stock levels by category using custom thresholds
     const categoryStock = {};
     products.forEach(product => {
       const category = product.category || 'Uncategorized';
@@ -34,7 +34,8 @@ export const GET = requireAdmin(async function(request) {
       }
       categoryStock[category].totalItems += 1;
       categoryStock[category].stockValue += product.price * product.stock;
-      if (product.stock <= 10) {
+      // Use custom threshold for each product
+      if (product.stock <= (product.lowStockThreshold || 10)) {
         categoryStock[category].lowStock += 1;
       }
     });
@@ -62,11 +63,12 @@ export const GET = requireAdmin(async function(request) {
         ...data
       })),
       lowStockProducts: products
-        .filter(p => p.stock <= 10)
+        .filter(p => p.stock <= (p.lowStockThreshold || 10)) // Use custom threshold
         .map(p => ({
           _id: p._id,
           name: p.name,
           stock: p.stock,
+          threshold: p.lowStockThreshold || 10, // Include threshold in response
           category: p.category
         })),
       productPerformance: productPerformance.slice(0, 10) // Top 10 products
@@ -79,4 +81,4 @@ export const GET = requireAdmin(async function(request) {
       { status: 500 }
     );
   }
-}); 
+});

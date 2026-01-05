@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
 import { StatCardSkeleton, TableSkeleton, ErrorState } from '@/components/ui/SkeletonLoader';
+import SalesChart from '@/components/admin/dashboard/charts/SalesChart';
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -111,10 +112,18 @@ export default function AdminDashboard() {
         )}
       </div>
 
+      {/* Sales Chart Section */}
+      <div className="mb-8">
+        <SalesChart />
+      </div>
+
       {/* Quick Actions */}
       <div className="flex gap-4 mb-8 flex-wrap">
         <Link href="/admin/products/add" className="btn btn-primary">
           Add New Product
+        </Link>
+        <Link href="/admin/analytics" className="btn btn-secondary">
+          📊 Analytics Dashboard
         </Link>
         <Link href="/admin/orders" className="btn btn-outline">
           View All Orders
