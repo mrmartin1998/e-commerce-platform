@@ -290,8 +290,8 @@ This project demonstrates **enterprise-ready development practices**:
 
 **Martin Emil Brabenec** - Full-Stack Developer  
 - 🌐 **Portfolio**: [martin-emil-brabenec.vercel.app](https://martin-emil-brabenec.vercel.app)
-- 💼 **LinkedIn**: [Professional Profile](https://linkedin.com/in/your-profile)
-- 📧 **Email**: your.email@example.com
+- 💼 **LinkedIn**: [Professional Profile](https://www.linkedin.com/in/martin-emil-brabenec-33b818148/)
+- 📧 **Email**: martinemilbrabenec@gmail.com
 - 🐙 **GitHub**: [@mrmartin1998](https://github.com/mrmartin1998)
 
 ---

@@ -161,7 +161,7 @@ export function CartProvider({ children }) {
                 quantity,
                 price: productData.product.price,
                 name: productData.product.name,
-                image: productData.product.images?.[0]?.url || null
+                image: productData.product.images?.[0]?.url || '/images/placeholder.png' // Fix: Use proper fallback
               });
             }
           } catch (err) {
@@ -172,7 +172,7 @@ export function CartProvider({ children }) {
               quantity,
               price: 0,
               name: 'Product',
-              image: null
+              image: '/images/placeholder.png' // Fix: Use proper fallback
             });
           }
         }
