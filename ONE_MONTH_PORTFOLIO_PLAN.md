@@ -219,16 +219,18 @@ Users are getting logged out too quickly. JWT tokens expire after just a few min
 Product images are not showing in the shopping cart, affecting user experience.
 
 **Tasks:**
-- [ ] Debug cart item image rendering
-- [ ] Check image URL passing from product to cart
-- [ ] Verify image data structure in cart store
-- [ ] Test image display in cart dropdown
-- [ ] Test image display on cart page
+- [x] Debug cart item image rendering
+- [x] Check image URL passing from product to cart
+- [x] Verify image data structure in cart store
+- [x] Test image display in cart dropdown
+- [x] Test image display on cart page
 
 **Acceptance Criteria:**
-- Product images display correctly in cart
-- Images load on both cart dropdown and cart page
-- No broken image placeholders
+- ✅ Product images display correctly in cart
+- ✅ Images load on both cart dropdown and cart page
+- ✅ No broken image placeholders
+
+**Resolution:** Added `.lean()` to cart populate query to return plain objects with all fields, matching the products route pattern.
 
 ---
 
