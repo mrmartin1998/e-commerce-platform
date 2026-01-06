@@ -49,21 +49,28 @@ export async function GET(request) {
     const sortObj = {};
     sortObj[sortBy] = sortOrder === 'asc' ? 1 : -1;
     
-    // Execute query with pagination
+    // Execute query with pagination using aggregation for performance
     const skip = (page - 1) * limit;
-    const products = await Product.find(criteria)
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limit)
-      .select('-__v')
-      .lean(); // Add .lean() to get plain objects with all fields
+    const [result] = await Product.aggregate([
+      { $match: criteria },
+      {
+        $facet: {
+          products: [
+            { $sort: sortObj },
+            { $skip: skip },
+            { $limit: limit },
+            { $project: { __v: 0 } }
+          ],
+          totalCount: [
+            { $count: 'count' }
+          ]
+        }
+      }
+    ]);
     
-    const total = await Product.countDocuments(criteria);
+    const products = result.products || [];
+    const total = result.totalCount[0]?.count || 0;
     const totalPages = Math.ceil(total / limit);
-    
-    // Debug: Log what we're actually getting from database
-    console.log('API: First product from DB:', products[0]);
-    console.log('API: First product images:', products[0]?.images);
     
     return NextResponse.json({ 
       products,

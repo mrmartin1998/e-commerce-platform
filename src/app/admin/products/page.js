@@ -28,12 +28,6 @@ export default function AdminProductsPage() {
           throw new Error(data.error);
         }
         
-        // Debug: Check what images look like
-        console.log('Products with images:', data.products.map(p => ({
-          name: p.name,
-          images: p.images
-        })));
-        
         setProducts(data.products);
       } catch (err) {
         console.error('Products fetch error:', err);
@@ -107,6 +101,7 @@ export default function AdminProductsPage() {
                       alt={product.name}
                       fill
                       className="object-cover rounded"
+                      loading="lazy"
                     />
                     {product.images?.length > 1 && (
                       <div className="absolute -top-1 -right-1">

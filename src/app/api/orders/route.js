@@ -13,22 +13,33 @@ export const GET = requireAuth(async function getHandler(request) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const skip = (page - 1) * limit;
 
-    console.log('Searching for orders with:', {
-      userId: request.user._id,
-      skip,
-      limit
-    });
+    // Use aggregation for single query with count
+    const [result] = await Order.aggregate([
+      { $match: { userId: request.user._id } },
+      {
+        $facet: {
+          orders: [
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $lookup: {
+                from: 'products',
+                localField: 'items.productId',
+                foreignField: '_id',
+                as: 'populatedProducts'
+              }
+            }
+          ],
+          totalCount: [
+            { $count: 'count' }
+          ]
+        }
+      }
+    ]);
 
-    const orders = await Order.find({ userId: request.user._id })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('items.productId');
-
-    const total = await Order.countDocuments({ userId: request.user._id });
-
-    console.log('Found orders:', orders);
-    console.log('Total count:', total);
+    const orders = result.orders || [];
+    const total = result.totalCount[0]?.count || 0;
 
     return NextResponse.json({
       orders,
