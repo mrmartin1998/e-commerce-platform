@@ -11,6 +11,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }) {
           fill
           className="object-cover rounded-lg"
           sizes="64px"
+          loading="lazy"
           onError={(e) => {
             e.target.src = '/images/placeholder.png';
           }}

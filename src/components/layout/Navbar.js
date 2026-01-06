@@ -21,7 +21,6 @@ export default function Navbar() {
       .then(res => res.json())
       .then(data => {
         if (data.user) {
-          console.log('User data:', data.user);
           setUser(data.user);
         }
       })

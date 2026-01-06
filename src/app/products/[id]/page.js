@@ -88,7 +88,8 @@ export default function ProductDetailPage() {
               alt={`${product.name} - Image ${selectedImageIndex + 1}`}
               fill
               className="object-cover"
-              priority
+              priority={selectedImageIndex === 0}
+              loading={selectedImageIndex === 0 ? undefined : "lazy"}
             />
             
             {/* Image Navigation for Multiple Images */}
@@ -137,6 +138,7 @@ export default function ProductDetailPage() {
                     alt={`${product.name} thumbnail ${index + 1}`}
                     fill
                     className="object-cover"
+                    loading="lazy"
                   />
                 </button>
               ))}

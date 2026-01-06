@@ -139,6 +139,7 @@ export default function CheckoutPage() {
                         alt={item.name}
                         fill
                         className="object-cover rounded-lg"
+                        loading="lazy"
                       />
                     </div>
                     <div className="flex-1 min-w-0">

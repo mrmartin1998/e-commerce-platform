@@ -44,12 +44,9 @@ export const GET = async function(request, context) {
       );
     }
 
-    console.log('Product API - Images for product:', product.name, product.images); // Debug log
-
     return NextResponse.json({ product });
-    
   } catch (error) {
-    console.error('Product fetch error:', error);
+    console.error('Get product error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch product' },
       { status: 500 }
