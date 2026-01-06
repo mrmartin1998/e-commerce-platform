@@ -65,6 +65,7 @@ export default function CartDropdown({ isOpen, onClose }) {
                     alt={item.name}
                     fill
                     className="object-cover rounded"
+                    loading="lazy"
                   />
                 </div>
                 <div className="flex-1">

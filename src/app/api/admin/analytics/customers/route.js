@@ -16,59 +16,145 @@ export const GET = requireAdmin(async function(request) {
       ? new Date(searchParams.get('endDate'))
       : new Date();
 
-    // Get all users and their orders
-    const users = await User.find({ role: 'user' });
-    const orders = await Order.find()
-      .populate('userId', 'name email')
-      .sort({ createdAt: -1 });
+    // Overview metrics using aggregation
+    const [overviewResult] = await User.aggregate([
+      { $match: { role: 'user' } },
+      {
+        $facet: {
+          overview: [
+            {
+              $group: {
+                _id: null,
+                totalCustomers: { $sum: 1 },
+                newCustomersThisMonth: {
+                  $sum: {
+                    $cond: [
+                      {
+                        $and: [
+                          { $gte: ['$createdAt', startDate] },
+                          { $lte: ['$createdAt', endDate] }
+                        ]
+                      },
+                      1,
+                      0
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]);
 
-    // Calculate overview metrics
+    // Active customers and average orders per customer
+    const [orderStats] = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          activeCustomers: { $addToSet: '$userId' }
+        }
+      },
+      {
+        $project: {
+          totalOrders: 1,
+          activeCustomersCount: { $size: '$activeCustomers' }
+        }
+      }
+    ]);
+
     const overview = {
-      totalCustomers: users.length,
-      activeCustomers: new Set(orders.map(order => order.userId?._id?.toString())).size,
-      averageOrdersPerCustomer: orders.length / users.length || 0,
-      newCustomersThisMonth: users.filter(user => 
-        user.createdAt >= startDate && user.createdAt <= endDate
-      ).length
+      totalCustomers: overviewResult.overview[0]?.totalCustomers || 0,
+      activeCustomers: orderStats?.activeCustomersCount || 0,
+      averageOrdersPerCustomer: overviewResult.overview[0]?.totalCustomers 
+        ? (orderStats?.totalOrders || 0) / overviewResult.overview[0].totalCustomers 
+        : 0,
+      newCustomersThisMonth: overviewResult.overview[0]?.newCustomersThisMonth || 0
     };
 
-    // Calculate customer growth trends
-    const customersByDate = {};
-    users.forEach(user => {
-      const date = user.createdAt.toISOString().split('T')[0];
-      if (!customersByDate[date]) {
-        customersByDate[date] = { new: 0, total: 0 };
+    // Customer growth trends using aggregation
+    const trends = await User.aggregate([
+      { $match: { role: 'user' } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          newCustomers: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: -1 } },
+      {
+        $group: {
+          _id: null,
+          dates: {
+            $push: {
+              date: '$_id',
+              newCustomers: '$newCustomers'
+            }
+          }
+        }
       }
-      customersByDate[date].new += 1;
-    });
+    ]);
 
     // Calculate cumulative totals
     let runningTotal = 0;
-    const trends = Object.entries(customersByDate)
-      .map(([date, data]) => {
-        runningTotal += data.new;
-        return {
-          _id: date,
-          newCustomers: data.new,
-          totalCustomers: runningTotal
-        };
-      })
-      .sort((a, b) => b._id.localeCompare(a._id));
-
-    // Geographic distribution
-    const geoDistribution = {};
-    users.forEach(user => {
-      const country = user.addresses?.[0]?.country || 'Unknown';
-      geoDistribution[country] = (geoDistribution[country] || 0) + 1;
+    const trendsWithTotal = (trends[0]?.dates || []).map(item => {
+      runningTotal += item.newCustomers;
+      return {
+        _id: item.date,
+        newCustomers: item.newCustomers,
+        totalCustomers: runningTotal
+      };
     });
 
-    // Purchase frequency analysis
-    const purchaseFrequency = {};
-    orders.forEach(order => {
-      const userId = order.userId?._id?.toString();
-      if (!userId) return;
-      purchaseFrequency[userId] = (purchaseFrequency[userId] || 0) + 1;
-    });
+    // Geographic distribution using aggregation
+    const geoDistribution = await User.aggregate([
+      { $match: { role: 'user' } },
+      {
+        $project: {
+          country: {
+            $ifNull: [
+              { $arrayElemAt: ['$addresses.country', 0] },
+              'Unknown'
+            ]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: '$country',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          country: '$_id',
+          count: 1
+        }
+      }
+    ]);
+
+    // Purchase frequency analysis using aggregation
+    const purchaseFrequencyData = await Order.aggregate([
+      {
+        $group: {
+          _id: '$userId',
+          orderCount: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          frequencies: {
+            $push: {
+              userId: '$_id',
+              count: '$orderCount'
+            }
+          }
+        }
+      }
+    ]);
 
     const frequencyDistribution = {
       oneTime: 0,
@@ -76,7 +162,7 @@ export const GET = requireAdmin(async function(request) {
       frequent: 0
     };
 
-    Object.values(purchaseFrequency).forEach(count => {
+    (purchaseFrequencyData[0]?.frequencies || []).forEach(({ count }) => {
       if (count === 1) frequencyDistribution.oneTime++;
       else if (count <= 3) frequencyDistribution.repeated++;
       else frequencyDistribution.frequent++;
@@ -84,16 +170,12 @@ export const GET = requireAdmin(async function(request) {
 
     return NextResponse.json({
       overview,
-      trends,
-      geoDistribution: Object.entries(geoDistribution).map(([country, count]) => ({
-        country,
-        count
-      })),
+      trends: trendsWithTotal,
+      geoDistribution,
       purchaseFrequency: frequencyDistribution
     });
 
   } catch (error) {
-    console.error('Customer analytics error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch customer analytics' },
       { status: 500 }

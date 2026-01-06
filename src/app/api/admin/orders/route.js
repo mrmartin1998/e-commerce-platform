@@ -13,14 +13,43 @@ export const GET = requireAuth(async function(request) {
     const limit = parseInt(searchParams.get('limit')) || 10;
     const skip = (page - 1) * limit;
     
-    // Find orders with populated user data
-    const orders = await Order.find()
-      .populate('userId', 'name email')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    // Use aggregation for single query with count and population
+    const [result] = await Order.aggregate([
+      {
+        $facet: {
+          orders: [
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $lookup: {
+                from: 'users',
+                localField: 'userId',
+                foreignField: '_id',
+                as: 'user'
+              }
+            },
+            { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+            {
+              $addFields: {
+                userId: {
+                  _id: '$user._id',
+                  name: '$user.name',
+                  email: '$user.email'
+                }
+              }
+            },
+            { $project: { user: 0 } }
+          ],
+          totalCount: [
+            { $count: 'count' }
+          ]
+        }
+      }
+    ]);
     
-    const total = await Order.countDocuments();
+    const orders = result.orders || [];
+    const total = result.totalCount[0]?.count || 0;
     
     return NextResponse.json({
       orders,

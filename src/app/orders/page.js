@@ -34,7 +34,6 @@ export default function OrdersPage() {
       });
 
       const data = await response.json();
-      console.log('Orders received:', data);
       
       if (data.error) {
         throw new Error(data.error);
@@ -95,6 +94,7 @@ export default function OrdersPage() {
                   width={80}
                   height={80}
                   className="rounded-lg object-cover"
+                  loading="lazy"
                 />
                 <div className="flex-1">
                   <h3 className="font-semibold">{item.productId.name}</h3>

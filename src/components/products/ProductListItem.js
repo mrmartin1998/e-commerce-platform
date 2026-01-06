@@ -18,6 +18,7 @@ export default function ProductListItem({ product }) {
           fill
           className="object-cover"
           sizes="(max-width: 640px) 128px, 192px"
+          loading="lazy"
         />
         
         {/* Multiple Images Indicator and Navigation */}

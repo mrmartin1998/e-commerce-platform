@@ -46,4 +46,14 @@ const productSchema = new Schema({
   timestamps: true
 });
 
+// Indexes for query optimization
+// Compound index for common filtered queries (status + category + sorting by date)
+productSchema.index({ status: 1, category: 1, createdAt: -1 });
+
+// Compound index for price range filtering with status
+productSchema.index({ status: 1, price: 1 });
+
+// Text index for search functionality on name and description
+productSchema.index({ name: 'text', description: 'text' });
+
 export default mongoose.models.Product || mongoose.model('Product', productSchema);
