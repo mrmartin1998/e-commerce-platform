@@ -44,6 +44,10 @@ export const GET = async function(request, context) {
       );
     }
 
+    return NextResponse.json({ product });
+  } catch (error) {
+    console.error('Get product error:', error);
+    return NextResponse.json(
       { error: 'Failed to fetch product' },
       { status: 500 }
     );
