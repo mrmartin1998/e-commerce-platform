@@ -10,7 +10,8 @@ export const GET = requireAuth(async function(request) {
     
     // Find cart and populate product details
     const cart = await Cart.findOne({ userId: request.user._id })
-      .populate('items.productId', 'name images price');
+      .populate('items.productId')
+      .lean(); // Use lean() to get plain objects like the products route
 
     if (!cart) {
       // If no cart exists, return empty cart instead of error
@@ -21,13 +22,15 @@ export const GET = requireAuth(async function(request) {
     }
 
     // Format response to match frontend expectations
-    const items = cart.items.map(item => ({
-      productId: item.productId?._id || item.productId,
-      quantity: item.quantity,
-      price: item.price,
-      name: item.productId?.name || 'Product Not Found',
-      image: item.productId?.images?.[0]?.url || null
-    }));
+    const items = cart.items.map(item => {
+      return {
+        productId: item.productId?._id || item.productId,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.productId?.name || 'Product Not Found',
+        image: item.productId?.images?.[0]?.url || '/images/placeholder.png'
+      };
+    });
 
     return NextResponse.json({
       items,
