@@ -281,10 +281,10 @@ Application is slow in general. Need to identify and fix performance bottlenecks
 **Labels:** `high`, `code-quality`, `cleanup`
 
 **Tasks:**
-- [ ] Remove all console.log statements from production code
-- [ ] Remove debug comments
-- [ ] Clean up commented-out code
-- [ ] Verify no debug tools in production build
+- [x] Remove all console.log statements from production code
+- [x] Remove debug comments
+- [x] Clean up commented-out code
+- [x] Verify no debug tools in production build
 
 ---
 
@@ -294,10 +294,10 @@ Application is slow in general. Need to identify and fix performance bottlenecks
 **Labels:** `high`, `documentation`, `cleanup`
 
 **Tasks:**
-- [ ] Delete visa-related issues (#4-10 in .github/ISSUES/)
-- [ ] Keep only e-commerce related issues
-- [ ] Update ISSUES_INDEX.md
-- [ ] Organize remaining issues
+- [x] Delete visa-related issues (#4-10 in .github/ISSUES/)
+- [x] Keep only e-commerce related issues
+- [x] Update ISSUES_INDEX.md
+- [x] Organize remaining issues
 
 ---
 
