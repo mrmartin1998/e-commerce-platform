@@ -12,6 +12,26 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['__tests__/setup/setup.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        '__tests__/',
+        '*.config.*',
+        'src/app/layout.js',
+        'src/app/globals.css',
+        '.next/',
+        'public/',
+        'scripts/',
+      ],
+      thresholds: {
+        lines: 60,
+        functions: 60,
+        branches: 60,
+        statements: 60,
+      },
+    },
   },
   resolve: {
     alias: {
