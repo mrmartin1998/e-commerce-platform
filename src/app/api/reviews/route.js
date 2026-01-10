@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Review, Order } from '@/lib/models';
+import { Review, Order, Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { verifyAuth } from '@/lib/middleware/auth';
 
@@ -57,7 +57,19 @@ export async function POST(request) {
     }
 
     // STEP 6: Check if user has purchased this product (VERIFIED PURCHASE)
-    // We look in the Orders collection for a completed order containing this product
+    // 
+    // WHY THIS MATTERS:
+    // Verified purchases add credibility to reviews
+    // Users trust reviews from actual buyers more than random reviews
+    // 
+    // HOW IT WORKS:
+    // We search the Orders collection for:
+    // 1. An order by this user (userId matches)
+    // 2. That contains this product (items.productId matches)
+    // 3. That was successfully completed (status is delivered/completed/paid)
+    // 
+    // If found → Review gets "Verified Purchase" badge ✓
+    // If not found → Review is still valid, just not verified
     const hasPurchased = await Order.exists({
       userId: user.userId,
       'items.productId': productId,
@@ -85,15 +97,21 @@ export async function POST(request) {
     // We use our static method from the Review model
     const stats = await Review.calculateAverageRating(productId);
     
-    // TODO: Update Product model with new averageRating and reviewCount
-    // (We'll do this in a later step)
+    // STEP 10: Update Product model with new rating statistics
+    // This updates the denormalized data for fast display
+    // Now product cards can show ratings without querying all reviews!
+    await Product.findByIdAndUpdate(productId, {
+      averageRating: stats.averageRating,
+      reviewCount: stats.reviewCount
+    });
 
     return NextResponse.json(
       { 
         success: true,
         review,
         message: 'Review submitted successfully',
-        stats // Include updated stats in response
+        stats, // Include updated stats in response
+        isVerifiedPurchase: !!hasPurchased // Let frontend know if verified
       },
       { status: 201 } // 201 = Created
     );
