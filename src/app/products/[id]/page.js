@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import AddToCartButton from '@/components/products/AddToCartButton';
 import { useCart } from '@/store/cartStore';
+import ReviewForm from '@/components/products/ReviewForm';
+import ReviewList from '@/components/products/ReviewList';
 
 async function getProduct(id) {
   const res = await fetch(`/api/products/${id}`);
@@ -22,6 +24,7 @@ export default function ProductDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [imageError, setImageError] = useState(false);
+  const [refreshReviews, setRefreshReviews] = useState(0); // Used to trigger ReviewList refresh
 
   useEffect(() => {
     if (params?.id) {
@@ -35,6 +38,12 @@ export default function ProductDetailPage() {
     if (product) {
       addToCart(product._id, quantity); // Fix: Call with productId and quantity
     }
+  };
+
+  // Callback function for when a review is successfully submitted
+  // This increments refreshReviews which triggers ReviewList to re-fetch data
+  const handleReviewSubmitted = () => {
+    setRefreshReviews(prev => prev + 1);
   };
 
   // Get the image URL with fallback
@@ -209,6 +218,27 @@ export default function ProductDetailPage() {
               <span>This item is currently out of stock</span>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12 max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        
+        {/* Review Form - Let users write reviews */}
+        <div className="mb-8">
+          <ReviewForm 
+            productId={product._id} 
+            onReviewSubmitted={handleReviewSubmitted}
+          />
+        </div>
+
+        {/* Review List - Display all reviews */}
+        <div>
+          <ReviewList 
+            productId={product._id}
+            refreshKey={refreshReviews}
+          />
         </div>
       </div>
     </div>
