@@ -13,3 +13,4 @@ export const TokenBlacklist = mongoose.models.TokenBlacklist ||
   mongoose.model('TokenBlacklist', tokenBlacklistSchema);
 export { default as Category } from './Category';
 export { default as Product } from './Product'; // This should be your main Product model
+export { default as Review } from './Review'; // New Review model for product reviews

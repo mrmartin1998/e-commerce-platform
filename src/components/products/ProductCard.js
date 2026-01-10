@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import StarRating from './StarRating';
 
 export default function ProductCard({ product }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -80,6 +81,24 @@ export default function ProductCard({ product }) {
       
       <div className="card-body">
         <h2 className="card-title">{product.name}</h2>
+        
+        {/* Star Rating Display */}
+        {/* Shows average rating and review count if product has reviews */}
+        {/* Size 'sm' keeps it compact for card layout */}
+        <div className="flex items-center gap-2">
+          <StarRating 
+            rating={product.averageRating || 0} 
+            readOnly={true}
+            size="sm"
+            showNumber={false}
+          />
+          {product.reviewCount > 0 && (
+            <span className="text-sm text-base-content/70">
+              ({product.reviewCount})
+            </span>
+          )}
+        </div>
+        
         <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>
         <div className="flex justify-between items-center mt-4">
           <span className="text-xl font-bold">${product.price}</span>

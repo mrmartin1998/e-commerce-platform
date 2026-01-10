@@ -41,7 +41,35 @@ const productSchema = new Schema({
     name: String,
     size: Number,
     type: String
-  }]
+  }],
+  // Review-related fields
+  // These are denormalized data (stored in both Product and Review models)
+  // Why? For performance - showing average ratings on product cards without querying all reviews
+  averageRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+    // Validation: ensure rating is between 0 and 5
+    validate: {
+      validator: function(v) {
+        return v >= 0 && v <= 5;
+      },
+      message: 'Average rating must be between 0 and 5'
+    }
+  },
+  reviewCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    // Validation: ensure count is not negative
+    validate: {
+      validator: function(v) {
+        return v >= 0;
+      },
+      message: 'Review count cannot be negative'
+    }
+  }
 }, {
   timestamps: true
 });
