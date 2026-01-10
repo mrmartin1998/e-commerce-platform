@@ -6,7 +6,7 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-Database-green?logo=mongodb)](https://mongodb.com/)
 [![Stripe](https://img.shields.io/badge/Stripe-Payments-purple?logo=stripe)](https://stripe.com/)
 
-> **🚀 [Live Demo](https://your-demo-link.vercel.app)** | **📋 [Project Board](https://github.com/mrmartin1998/e-commerce-platform/projects)** | **🔧 [Issues](https://github.com/mrmartin1998/e-commerce-platform/issues)**
+> **🚀 [Live Demo](https://e-commerce-platform-three.vercel.app/)** | **📋 [Project Board](https://github.com/mrmartin1998/e-commerce-platform/projects)** | **🔧 [Issues](https://github.com/mrmartin1998/e-commerce-platform/issues)**
 
 A **production-ready e-commerce platform** built with enterprise-grade development practices. This project demonstrates full-stack development capabilities, professional workflow execution, and modern web application architecture.
 
