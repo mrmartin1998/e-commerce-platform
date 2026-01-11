@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StarRating from './StarRating';
 
 /**
  * ========================================
- * REVIEW FORM COMPONENT
+ * REVIEW FORM COMPONENT (CREATE & EDIT)
  * ========================================
  * 
  * LEARNING POINTS:
@@ -18,13 +18,17 @@ import StarRating from './StarRating';
  * 4. ERROR HANDLING: Gracefully handle failures
  * 5. USER FEEDBACK: Show success/error messages
  * 6. COMPONENT COMPOSITION: Uses StarRating component we built
+ * 7. DUAL MODE: Can create NEW reviews or EDIT existing ones
  * 
  * FLOW:
- * User fills form → Validates → Sends to API → Shows result → Clears form
+ * - CREATE MODE: User fills form → Validates → POST to API → Shows result → Clears form
+ * - EDIT MODE: Form pre-filled → User changes → Validates → PUT to API → Shows result
  */
 
 export default function ReviewForm({ 
   productId,        // Which product is being reviewed
+  existingReview,   // If editing, the review data to pre-fill (optional)
+  mode = 'create',  // 'create' or 'edit' mode
   onReviewSubmitted // Callback to parent when review is successful
 }) {
   
@@ -33,12 +37,27 @@ export default function ReviewForm({
    * ----------
    * We use React state to track all form data
    * This makes the form a "controlled component"
+   * 
+   * NEW: Initialize with existing review data if in edit mode
    */
-  const [rating, setRating] = useState(0);           // Selected star rating
-  const [comment, setComment] = useState('');        // Review text
-  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
-  const [error, setError] = useState('');            // Error message
-  const [success, setSuccess] = useState(false);     // Success flag
+  const [rating, setRating] = useState(existingReview?.rating || 0);
+  const [comment, setComment] = useState(existingReview?.comment || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  /**
+   * useEffect Hook - Pre-fill Form in Edit Mode
+   * -------------------------------------------
+   * When existingReview prop changes, update the form
+   * This ensures form stays in sync with passed data
+   */
+  useEffect(() => {
+    if (existingReview) {
+      setRating(existingReview.rating || 0);
+      setComment(existingReview.comment || '');
+    }
+  }, [existingReview]);
 
   /**
    * VALIDATION FUNCTION
@@ -73,13 +92,17 @@ export default function ReviewForm({
    * -------------
    * This is where the magic happens!
    * 
+   * NEW: Now handles BOTH create and edit modes
+   * - CREATE: POST to /api/reviews
+   * - EDIT: PUT to /api/reviews/[id]
+   * 
    * STEPS:
    * 1. Prevent default form submission (page reload)
    * 2. Validate form data
    * 3. Show loading state
-   * 4. Send data to API
+   * 4. Send data to appropriate API endpoint
    * 5. Handle response (success or error)
-   * 6. Reset form or show error
+   * 6. Reset form (create) or keep data (edit)
    */
   const handleSubmit = async (e) => {
     e.preventDefault(); // IMPORTANT: Prevents page reload
@@ -96,18 +119,38 @@ export default function ReviewForm({
 
     try {
       /**
+       * GET AUTHENTICATION TOKEN
+       * ------------------------
+       * Retrieve JWT token from localStorage to authenticate the request
+       */
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Please log in to submit a review');
+      }
+
+      /**
+       * DETERMINE API ENDPOINT & METHOD
+       * --------------------------------
+       * CREATE MODE: POST /api/reviews
+       * EDIT MODE: PUT /api/reviews/[reviewId]
+       */
+      const url = mode === 'edit' 
+        ? `/api/reviews/${existingReview._id}`
+        : '/api/reviews';
+      
+      const method = mode === 'edit' ? 'PUT' : 'POST';
+
+      /**
        * FETCH API CALL
        * --------------
-       * This sends data to our backend API endpoint
-       * 
-       * METHOD: POST (we're creating something new)
-       * HEADERS: Tell server we're sending JSON
-       * BODY: Convert JavaScript object to JSON string
+       * Sends data to backend API endpoint
+       * IMPORTANT: Includes Authorization header with JWT token
        */
-      const response = await fetch('/api/reviews', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Auth token for protected route
         },
         body: JSON.stringify({
           productId,
@@ -139,9 +182,12 @@ export default function ReviewForm({
       // SUCCESS! 🎉
       setSuccess(true);
       
-      // Clear the form
-      setRating(0);
-      setComment('');
+      // Only clear form in CREATE mode
+      // In EDIT mode, keep the updated values
+      if (mode === 'create') {
+        setRating(0);
+        setComment('');
+      }
 
       // Notify parent component (if callback provided)
       if (onReviewSubmitted) {
@@ -166,7 +212,9 @@ export default function ReviewForm({
   return (
     <div className="card bg-base-200 shadow-lg">
       <div className="card-body">
-        <h3 className="card-title text-lg">Write a Review</h3>
+        <h3 className="card-title text-lg">
+          {mode === 'edit' ? 'Edit Your Review' : 'Write a Review'}
+        </h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           
@@ -240,7 +288,11 @@ export default function ReviewForm({
               <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Review submitted successfully! Thank you for your feedback.</span>
+              <span>
+                {mode === 'edit' 
+                  ? 'Review updated successfully!' 
+                  : 'Review submitted successfully! Thank you for your feedback.'}
+              </span>
             </div>
           )}
 
@@ -254,10 +306,10 @@ export default function ReviewForm({
               {isSubmitting ? (
                 <>
                   <span className="loading loading-spinner loading-sm"></span>
-                  Submitting...
+                  {mode === 'edit' ? 'Updating...' : 'Submitting...'}
                 </>
               ) : (
-                'Submit Review'
+                mode === 'edit' ? 'Update Review' : 'Submit Review'
               )}
             </button>
           </div>
@@ -266,8 +318,9 @@ export default function ReviewForm({
         {/* HELPER TEXT */}
         <div className="text-sm text-base-content/60 mt-2">
           <p>
-            ℹ️ Only verified purchasers can submit reviews. 
-            Your review will appear after submission.
+            ℹ️ {mode === 'edit' 
+              ? 'You can update your review at any time.' 
+              : 'Only verified purchasers can submit reviews. Your review will appear after submission.'}
           </p>
         </div>
       </div>
@@ -283,29 +336,27 @@ export default function ReviewForm({
  * PROPS:
  * ------
  * @param {string} productId - ID of product being reviewed (required)
+ * @param {object} existingReview - Review data for edit mode (optional)
+ * @param {string} mode - 'create' or 'edit' (default: 'create')
  * @param {function} onReviewSubmitted - Callback after successful submission
  * 
- * USAGE EXAMPLE:
- * --------------
+ * USAGE EXAMPLES:
+ * ---------------
  * 
- * // In a product page:
- * import ReviewForm from '@/components/products/ReviewForm';
+ * // CREATE MODE - New review:
+ * <ReviewForm 
+ *   productId={product._id}
+ *   mode="create"
+ *   onReviewSubmitted={handleReviewAdded}
+ * />
  * 
- * export default function ProductPage({ product }) {
- *   const handleReviewAdded = (newReview) => {
- *     console.log('New review added:', newReview);
- *     // Refresh reviews list, update stats, etc.
- *   };
- * 
- *   return (
- *     <div>
- *       <ReviewForm 
- *         productId={product._id}
- *         onReviewSubmitted={handleReviewAdded}
- *       />
- *     </div>
- *   );
- * }
+ * // EDIT MODE - Update existing review:
+ * <ReviewForm 
+ *   productId={product._id}
+ *   existingReview={userReview}
+ *   mode="edit"
+ *   onReviewSubmitted={handleReviewUpdated}
+ * />
  * 
  * FEATURES:
  * ---------
@@ -317,5 +368,7 @@ export default function ReviewForm({
  * ✅ Success feedback with auto-hide
  * ✅ Character counter
  * ✅ Disabled state while submitting
- * ✅ Clears form after successful submission
+ * ✅ CREATE MODE: Clears form after successful submission
+ * ✅ EDIT MODE: Keeps form data after update
+ * ✅ Dynamic button text and messages based on mode
  */

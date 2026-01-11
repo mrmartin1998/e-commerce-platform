@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import ReviewForm from '@/components/products/ReviewForm';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -12,6 +13,8 @@ export default function OrdersPage() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState(null);
+  const [reviewingProduct, setReviewingProduct] = useState(null); // Product being reviewed
+  const [existingReviews, setExistingReviews] = useState({}); // Map of productId -> review
   const router = useRouter();
 
   const fetchOrders = useCallback(async () => {
@@ -53,6 +56,81 @@ export default function OrdersPage() {
     fetchOrders();
   }, [fetchOrders]);
 
+  // Check existing reviews when orders are loaded
+  useEffect(() => {
+    if (orders.length > 0) {
+      checkExistingReviews();
+    }
+  }, [orders]);
+
+  /**
+   * Check which products user has already reviewed
+   * This determines whether to show "Write Review" or "Edit Review"
+   */
+  const checkExistingReviews = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token || orders.length === 0) return;
+
+      // Get all unique product IDs from delivered orders
+      const deliveredOrders = orders.filter(order => order.status === 'delivered');
+      const productIds = [...new Set(
+        deliveredOrders.flatMap(order => 
+          order.items?.map(item => item.productId?._id || item.productId) || []
+        )
+      )];
+
+      if (productIds.length === 0) return;
+
+      // Check review status for each product
+      const reviewChecks = await Promise.all(
+        productIds.map(async (productId) => {
+          const response = await fetch(`/api/reviews/user-review?productId=${productId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const data = await response.json();
+          return { productId, review: data.review };
+        })
+      );
+
+      // Convert to map for easy lookup
+      const reviewsMap = {};
+      reviewChecks.forEach(({ productId, review }) => {
+        if (review) {
+          reviewsMap[productId] = review;
+        }
+      });
+
+      setExistingReviews(reviewsMap);
+    } catch (err) {
+      console.error('Error checking existing reviews:', err);
+    }
+  };
+
+  /**
+   * Open review modal for a product
+   */
+  const handleReviewProduct = (product) => {
+    setReviewingProduct(product);
+  };
+
+  /**
+   * Close review modal
+   */
+  const handleCloseReviewModal = () => {
+    setReviewingProduct(null);
+  };
+
+  /**
+   * Handle successful review submission
+   */
+  const handleReviewSubmitted = () => {
+    // Refresh existing reviews to update button state
+    checkExistingReviews();
+    // Close modal
+    handleCloseReviewModal();
+  };
+
   async function viewOrderDetails(orderId) {
     try {
       const token = localStorage.getItem('token');
@@ -86,23 +164,50 @@ export default function OrdersPage() {
           </h3>
           
           <div className="space-y-4">
-            {selectedOrder.items.map((item) => (
-              <div key={item._id} className="flex gap-4 items-center">
-                <Image
-                  src={item.productId.images[0]}
-                  alt={item.productId.name}
-                  width={80}
-                  height={80}
-                  className="rounded-lg object-cover"
-                  loading="lazy"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold">{item.productId.name}</h3>
-                  <p className="text-sm opacity-70">Quantity: {item.quantity}</p>
+            {selectedOrder.items.map((item) => {
+              const productId = item.productId._id || item.productId;
+              const existingReview = existingReviews[productId];
+              const isDelivered = selectedOrder.status === 'delivered';
+              
+              // Get image URL with proper fallback
+              const getImageUrl = () => {
+                if (item.productId?.images?.[0]) {
+                  // Check if it's an object with url property or just a string
+                  const img = item.productId.images[0];
+                  return typeof img === 'string' ? img : img.url;
+                }
+                // Fallback placeholder
+                return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMzc0MTUxIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiM5Y2EzYWYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+              };
+
+              return (
+                <div key={item._id} className="flex gap-4 items-center border-b pb-4">
+                  <Image
+                    src={getImageUrl()}
+                    alt={item.productId?.name || 'Product'}
+                    width={80}
+                    height={80}
+                    className="rounded-lg object-cover"
+                    loading="lazy"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{item.productId?.name || 'Unknown Product'}</h3>
+                    <p className="text-sm opacity-70">Quantity: {item.quantity}</p>
+                    <p className="font-semibold">${item.price?.toFixed(2) || '0.00'}</p>
+                    
+                    {/* Review Button - Only for delivered orders */}
+                    {isDelivered && (
+                      <button
+                        className={`btn btn-sm mt-2 ${existingReview ? 'btn-outline' : 'btn-primary'}`}
+                        onClick={() => handleReviewProduct(item.productId)}
+                      >
+                        {existingReview ? '✏️ Edit Review' : '⭐ Write Review'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <p className="font-semibold">${item.price.toFixed(2)}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="divider"></div>
@@ -227,6 +332,52 @@ export default function OrdersPage() {
       )}
 
       <OrderDetailsModal />
+      
+      {/* Review Modal */}
+      {reviewingProduct && (
+        <dialog className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <button 
+              className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              onClick={handleCloseReviewModal}
+            >
+              ✕
+            </button>
+            
+            <h3 className="font-bold text-lg mb-4">
+              {existingReviews[reviewingProduct._id] ? 'Edit Review' : 'Write Review'}
+            </h3>
+            
+            {/* Product Info */}
+            <div className="flex gap-4 items-center mb-6 p-4 bg-base-200 rounded-lg">
+              {reviewingProduct.images && reviewingProduct.images[0] && (
+                <Image
+                  src={reviewingProduct.images[0].url || reviewingProduct.images[0]}
+                  alt={reviewingProduct.name}
+                  width={60}
+                  height={60}
+                  className="rounded object-cover"
+                />
+              )}
+              <div>
+                <h4 className="font-semibold">{reviewingProduct.name}</h4>
+                <p className="text-sm opacity-70">${reviewingProduct.price}</p>
+              </div>
+            </div>
+
+            {/* Review Form */}
+            <ReviewForm
+              productId={reviewingProduct._id}
+              existingReview={existingReviews[reviewingProduct._id]}
+              mode={existingReviews[reviewingProduct._id] ? 'edit' : 'create'}
+              onReviewSubmitted={handleReviewSubmitted}
+            />
+          </div>
+          <form method="dialog" className="modal-backdrop" onClick={handleCloseReviewModal}>
+            <button>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   );
 }

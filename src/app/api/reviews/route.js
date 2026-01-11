@@ -71,7 +71,7 @@ export async function POST(request) {
     // If found → Review gets "Verified Purchase" badge ✓
     // If not found → Review is still valid, just not verified
     const hasPurchased = await Order.exists({
-      userId: user.userId,
+      userId: user._id,
       'items.productId': productId,
       status: { 
         $in: ['delivered', 'completed', 'paid'] // Order must be completed
@@ -81,7 +81,7 @@ export async function POST(request) {
     // STEP 7: Create the review
     // MongoDB will automatically prevent duplicates due to our unique index
     const review = await Review.create({
-      user: user.userId,
+      user: user._id,
       product: productId,
       rating,
       comment: comment || '', // Optional comment
