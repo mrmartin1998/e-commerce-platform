@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import AddToCartButton from '@/components/products/AddToCartButton';
 import { useCart } from '@/store/cartStore';
+import ReviewForm from '@/components/products/ReviewForm';
+import ReviewList from '@/components/products/ReviewList';
 
 async function getProduct(id) {
   const res = await fetch(`/api/products/${id}`);
@@ -22,18 +24,78 @@ export default function ProductDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [imageError, setImageError] = useState(false);
+  const [refreshReviews, setRefreshReviews] = useState(0); // Used to trigger ReviewList refresh
+  
+  // New states for review access control
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [existingReview, setExistingReview] = useState(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
 
   useEffect(() => {
     if (params?.id) {
       getProduct(params.id)
         .then(data => setProduct(data.product))
         .finally(() => setLoading(false));
+      
+      // Check review access
+      checkReviewAccess(params.id);
     }
   }, [params?.id]);
+
+  /**
+   * Check if user can write/edit reviews for this product
+   * This checks:
+   * 1. Is user logged in?
+   * 2. Has user purchased this product?
+   * 3. Does user already have a review?
+   */
+  const checkReviewAccess = async (productId) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setIsLoggedIn(false);
+        setCheckingAccess(false);
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      // Check if user purchased this product
+      const purchaseResponse = await fetch(`/api/orders/check-purchase?productId=${productId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const purchaseData = await purchaseResponse.json();
+      setHasPurchased(purchaseData.hasPurchased);
+
+      // Check if user already reviewed this product
+      const reviewResponse = await fetch(`/api/reviews/user-review?productId=${productId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const reviewData = await reviewResponse.json();
+      setExistingReview(reviewData.review);
+
+    } catch (err) {
+      console.error('Error checking review access:', err);
+    } finally {
+      setCheckingAccess(false);
+    }
+  };
 
   const handleAddToCart = () => {
     if (product) {
       addToCart(product._id, quantity); // Fix: Call with productId and quantity
+    }
+  };
+
+  // Callback function for when a review is successfully submitted
+  // This increments refreshReviews which triggers ReviewList to re-fetch data
+  const handleReviewSubmitted = () => {
+    setRefreshReviews(prev => prev + 1);
+    // Re-check review access to update UI
+    if (params?.id) {
+      checkReviewAccess(params.id);
     }
   };
 
@@ -209,6 +271,72 @@ export default function ProductDetailPage() {
               <span>This item is currently out of stock</span>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12 max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        
+        {/* Review Form - Conditional rendering based on user status */}
+        <div className="mb-8">
+          {checkingAccess ? (
+            // Loading state while checking access
+            <div className="card bg-base-200 shadow-lg">
+              <div className="card-body">
+                <div className="flex justify-center p-4">
+                  <span className="loading loading-spinner loading-md"></span>
+                </div>
+              </div>
+            </div>
+          ) : !isLoggedIn ? (
+            // Not logged in message
+            <div className="card bg-base-200 shadow-lg">
+              <div className="card-body">
+                <h3 className="card-title text-lg">Login to Leave a Review</h3>
+                <p className="text-base-content/70">
+                  You must be logged in to write a review for this product.
+                </p>
+                <div className="card-actions">
+                  <Link href="/auth/login" className="btn btn-primary">
+                    Login
+                  </Link>
+                  <Link href="/auth/register" className="btn btn-outline">
+                    Create Account
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : !hasPurchased ? (
+            // User logged in but hasn't purchased
+            <div className="card bg-base-200 shadow-lg">
+              <div className="card-body">
+                <h3 className="card-title text-lg">Purchase Required to Review</h3>
+                <p className="text-base-content/70">
+                  Only verified purchasers can leave reviews. Purchase this product to share your experience!
+                </p>
+                <p className="text-sm text-info mt-2">
+                  💡 Tip: Look for the "Write Review" button on your delivered orders page after purchasing.
+                </p>
+              </div>
+            </div>
+          ) : (
+            // User is logged in and has purchased - show form
+            <ReviewForm 
+              productId={product._id}
+              existingReview={existingReview}
+              mode={existingReview ? 'edit' : 'create'}
+              onReviewSubmitted={handleReviewSubmitted}
+            />
+          )}
+        </div>
+
+        {/* Review List - Display all reviews */}
+        <div>
+          <ReviewList 
+            productId={product._id}
+            refreshKey={refreshReviews}
+          />
         </div>
       </div>
     </div>
