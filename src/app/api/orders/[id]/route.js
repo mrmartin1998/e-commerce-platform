@@ -8,7 +8,9 @@ export const GET = requireAuth(async function(request, { params }) {
   try {
     await connectDB();
     
+    // Fix Next.js 15 params.await requirement
     const { id } = await params;
+    
     if (!isValidObjectId(id)) {
       return NextResponse.json(
         { error: 'Invalid order ID' },
@@ -16,12 +18,14 @@ export const GET = requireAuth(async function(request, { params }) {
       );
     }
 
+    // Populate statusHistory and tracking info for timeline display
     const order = await Order
       .findOne({ 
         _id: id,
         userId: request.user._id
       })
-      .populate('items.productId', 'name images price');
+      .populate('items.productId', 'name images price')
+      .populate('statusHistory.updatedBy', 'name email');
 
     if (!order) {
       return NextResponse.json(

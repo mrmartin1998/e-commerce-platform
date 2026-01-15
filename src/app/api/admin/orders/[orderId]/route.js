@@ -8,11 +8,14 @@ export const GET = requireAuth(async function getHandler(request, context) {
   try {
     await connectDB();
     
-    const orderId = context.params.orderId;
+    // Fix Next.js 15 params.await requirement
+    const params = await context.params;
+    const orderId = params.orderId;
     
     const order = await Order.findById(orderId)
       .populate('userId', 'name email')
-      .populate('items.productId', 'name price images');
+      .populate('items.productId', 'name price images')
+      .populate('statusHistory.updatedBy', 'name email');
     
     if (!order) {
       return NextResponse.json(
@@ -36,7 +39,9 @@ export const PATCH = requireAuth(async function patchHandler(request, context) {
   try {
     await connectDB();
     
-    const orderId = context.params.orderId;
+    // Fix Next.js 15 params.await requirement
+    const params = await context.params;
+    const orderId = params.orderId;
     const body = await request.json();
     const { status, trackingUrl, carrier, estimatedDelivery, note } = body;
 
