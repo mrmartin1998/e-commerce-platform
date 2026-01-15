@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import ReviewForm from '@/components/products/ReviewForm';
+import OrderStatusTimeline from '@/components/orders/OrderStatusTimeline';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -158,11 +159,64 @@ export default function OrdersPage() {
     
     return (
       <dialog className="modal modal-open">
-        <div className="modal-box max-w-3xl">
+        <div className="modal-box max-w-3xl max-h-[90vh] overflow-y-auto">
           <h3 className="font-bold text-lg mb-4">
             Order Details #{selectedOrder._id}
           </h3>
           
+          {/* Order Status Timeline */}
+          <div className="mb-6">
+            <h4 className="font-semibold text-md mb-3">Order Status</h4>
+            <OrderStatusTimeline 
+              statusHistory={selectedOrder.statusHistory || []}
+              currentStatus={selectedOrder.status}
+              estimatedDelivery={selectedOrder.estimatedDelivery}
+              showAdminInfo={false}
+            />
+          </div>
+
+          {/* Tracking Information */}
+          {selectedOrder.trackingUrl && (
+            <>
+              <div className="divider"></div>
+              <div className="bg-primary/10 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-md mb-3">📦 Shipping Information</h4>
+                <div className="space-y-2">
+                  {selectedOrder.carrier && (
+                    <p className="text-sm">
+                      <span className="font-semibold">Carrier:</span> {selectedOrder.carrier}
+                    </p>
+                  )}
+                  <p className="text-sm">
+                    <a 
+                      href={selectedOrder.trackingUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="link link-primary"
+                    >
+                      Track Your Package ↗
+                    </a>
+                  </p>
+                  {selectedOrder.estimatedDelivery && (
+                    <p className="text-sm">
+                      <span className="font-semibold">Estimated Delivery:</span>{' '}
+                      {new Date(selectedOrder.estimatedDelivery).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="divider"></div>
+
+          {/* Order Items */}
+          <h4 className="font-semibold text-md mb-3">Items</h4>
           <div className="space-y-4">
             {selectedOrder.items.map((item) => {
               const productId = item.productId._id || item.productId;
@@ -230,6 +284,27 @@ export default function OrdersPage() {
               <span>${selectedOrder.total.toFixed(2)}</span>
             </div>
           </div>
+
+          {/* Shipping Address */}
+          {selectedOrder.shippingAddress && (
+            <>
+              <div className="divider"></div>
+              <div className="bg-base-200 p-4 rounded-lg">
+                <h4 className="font-semibold text-md mb-2">📍 Shipping Address</h4>
+                <p className="text-sm">{selectedOrder.shippingAddress.fullName}</p>
+                <p className="text-sm">{selectedOrder.shippingAddress.street}</p>
+                <p className="text-sm">
+                  {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
+                </p>
+                <p className="text-sm">{selectedOrder.shippingAddress.country}</p>
+                {selectedOrder.shippingAddress.phone && (
+                  <p className="text-sm mt-2">
+                    <span className="font-semibold">Phone:</span> {selectedOrder.shippingAddress.phone}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
 
           <div className="modal-action">
             <button 
