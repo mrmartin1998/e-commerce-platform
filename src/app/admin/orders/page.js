@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import OrderDetailsModal from '@/app/components/admin/OrderDetailsModal';
+import OrderStatusUpdateModal from '@/app/components/admin/OrderStatusUpdateModal';
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -9,6 +10,7 @@ export default function AdminOrdersPage() {
   const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderToUpdate, setOrderToUpdate] = useState(null);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -46,30 +48,21 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, [fetchOrders]);
 
-  async function handleStatusUpdate(orderId, newStatus) {
-    try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
+  /**
+   * Handle successful order update from modal
+   * Updates the order in the local state without refetching all orders
+   */
+  function handleOrderUpdate(updatedOrder) {
+    setOrders(orders.map(order => 
+      order._id === updatedOrder._id ? updatedOrder : order
+    ));
+  }
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to update order status');
-      }
-      
-      const updatedOrder = await response.json();
-      setOrders(orders.map(order => 
-        order._id === orderId ? updatedOrder : order
-      ));
-    } catch (err) {
-      console.error('Status update error:', err);
-      alert(err.message);
-    }
+  /**
+   * Open the status update modal for a specific order
+   */
+  function openStatusUpdateModal(order) {
+    setOrderToUpdate(order);
   }
 
   async function viewOrderDetails(orderId) {
@@ -144,25 +137,31 @@ export default function AdminOrdersPage() {
                 <td>{new Date(order.paidAt || order.createdAt).toLocaleDateString()}</td>
                 <td>${order.total?.toFixed(2) || '0.00'}</td>
                 <td>
-                  <select
-                    className="select select-bordered select-sm"
-                    value={order.status || 'pending'}
-                    onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
+                  <span className={`badge ${
+                    order.status === 'delivered' ? 'badge-success' :
+                    order.status === 'shipped' ? 'badge-primary' :
+                    order.status === 'processing' ? 'badge-info' :
+                    order.status === 'cancelled' ? 'badge-error' :
+                    'badge-warning'
+                  }`}>
+                    {order.status || 'pending'}
+                  </span>
                 </td>
                 <td>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => viewOrderDetails(order._id)}
-                  >
-                    View Details
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => viewOrderDetails(order._id)}
+                    >
+                      View Details
+                    </button>
+                    <button
+                      className="btn btn-sm btn-secondary"
+                      onClick={() => openStatusUpdateModal(order)}
+                    >
+                      Update Status
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -174,6 +173,13 @@ export default function AdminOrdersPage() {
         order={selectedOrder}
         isOpen={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
+      />
+
+      <OrderStatusUpdateModal
+        order={orderToUpdate}
+        isOpen={!!orderToUpdate}
+        onClose={() => setOrderToUpdate(null)}
+        onUpdate={handleOrderUpdate}
       />
     </div>
   );
