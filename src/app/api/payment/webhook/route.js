@@ -1,6 +1,7 @@
 import { Order } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import Stripe from 'stripe';
+import { sendOrderConfirmation } from '@/lib/email';
 
 let stripeClient;
 function getStripeClient() {
@@ -47,13 +48,26 @@ export async function POST(request) {
         const paymentIntent = event.data.object;
         const order = await Order.findOne({
           paymentIntentId: paymentIntent.id
-        });
+        }).populate('userId').populate('items.productId');
 
         if (order) {
           order.paymentStatus = 'paid';
           order.status = 'processing';
           order.paidAt = new Date();
           await order.save();
+
+          // Send order confirmation email
+          try {
+            if (order.userId && order.userId.email) {
+              console.log(`📧 Sending order confirmation email for order #${order._id}`);
+              await sendOrderConfirmation(order, order.userId.email);
+            } else {
+              console.warn(`⚠️  Cannot send email - user email not found for order #${order._id}`);
+            }
+          } catch (emailError) {
+            // Log error but don't fail the webhook
+            console.error('❌ Failed to send order confirmation email:', emailError.message);
+          }
         }
         break;
 
