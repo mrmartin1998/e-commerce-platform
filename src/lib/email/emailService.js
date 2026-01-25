@@ -24,8 +24,24 @@ import { orderShippedTemplate } from './templates/orderShipped.js';
 import { orderDeliveredTemplate } from './templates/orderDelivered.js';
 import { orderCancelledTemplate } from './templates/orderCancelled.js';
 
-// Initialize Resend with API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization of Resend client
+let resendClient = null;
+
+/**
+ * Get or initialize Resend client
+ * Lazy initialization prevents errors when RESEND_API_KEY is not set (e.g., in tests)
+ */
+function getResendClient() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.warn('⚠️  RESEND_API_KEY not set - emails will not be sent');
+      return null;
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 /**
  * Check if we're in development mode
@@ -47,6 +63,13 @@ const isDevelopment = process.env.NODE_ENV === 'development';
  */
 async function sendEmail(to, subject, html) {
   try {
+    // Get Resend client (lazy initialization)
+    const resend = getResendClient();
+    if (!resend) {
+      console.warn('⚠️  Email not sent - Resend client not initialized');
+      return;
+    }
+
     // In development, redirect all emails to test recipient
     const recipient = isDevelopment ? process.env.EMAIL_TEST_RECIPIENT : to;
     
