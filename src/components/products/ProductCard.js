@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import StarRating from './StarRating';
+import AddToWishlistButton from './AddToWishlistButton';
 
 export default function ProductCard({ product }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -33,6 +34,14 @@ export default function ProductCard({ product }) {
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           loading="lazy"
         />
+        
+        {/* Wishlist Button - Top Right */}
+        <div className="absolute top-2 left-2 z-10">
+          <AddToWishlistButton 
+            productId={product._id} 
+            className="btn-sm bg-base-100/80 hover:bg-base-100"
+          />
+        </div>
         
         {/* Multiple Images Navigation */}
         {productImages.length > 1 && (

@@ -471,12 +471,24 @@ Send automated emails for orders and notifications.
 **Labels:** `medium`, `feature`, `user-experience`
 
 **Tasks:**
-- [ ] Create Wishlist model
-- [ ] Add wishlist CRUD API endpoints
-- [ ] Add "Add to Wishlist" button on products
-- [ ] Create wishlist page
-- [ ] Add wishlist counter to header
-- [ ] Add move to cart functionality
+- [x] Create Wishlist model
+- [x] Add wishlist CRUD API endpoints
+- [x] Add "Add to Wishlist" button on products
+- [x] Create wishlist page
+- [x] Add wishlist counter to header
+- [x] Add move to cart functionality
+
+**Acceptance Criteria:**
+- ✅ Wishlist model created with MongoDB schema
+- ✅ 5 API endpoints implemented (get, add, remove, clear, move-to-cart)
+- ✅ Heart icon button on product cards toggles wishlist
+- ✅ Wishlist page displays items in responsive grid
+- ✅ Navbar shows wishlist counter badge
+- ✅ Moving items to cart removes from wishlist
+- ✅ Toast notifications for all operations
+- ✅ Auth-only functionality with proper validation
+
+**Status:** ✅ COMPLETED - Full wishlist functionality implemented with state management, UI components, and cart integration
 
 ---
 

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import userSchema from './schemas/UserSchema';
 import orderSchema from './schemas/OrderSchema';
 import cartSchema from './schemas/CartSchema';
+import wishlistSchema from './schemas/WishlistSchema';
 import tokenBlacklistSchema from './schemas/TokenBlacklistSchema';
 
 // Only create
@@ -9,6 +10,7 @@ import tokenBlacklistSchema from './schemas/TokenBlacklistSchema';
 export const User = mongoose.models.User || mongoose.model('User', userSchema);
 export const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 export const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
+export const Wishlist = mongoose.models.Wishlist || mongoose.model('Wishlist', wishlistSchema);
 export const TokenBlacklist = mongoose.models.TokenBlacklist || 
   mongoose.model('TokenBlacklist', tokenBlacklistSchema);
 export { default as Category } from './Category';
