@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import AddToCartButton from '@/components/products/AddToCartButton';
+import AddToWishlistButton from '@/components/products/AddToWishlistButton';
 import { useCart } from '@/store/cartStore';
 import ReviewForm from '@/components/products/ReviewForm';
 import ReviewList from '@/components/products/ReviewList';
@@ -257,12 +258,15 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <button 
-                className="btn btn-primary w-full"
-                onClick={handleAddToCart}
-              >
-                Add to Cart
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  className="btn btn-primary flex-1"
+                  onClick={handleAddToCart}
+                >
+                  Add to Cart
+                </button>
+                <AddToWishlistButton productId={product._id} className="btn-lg" />
+              </div>
             </div>
           )}
 

@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { CartProvider } from '@/store/cartStore';
+import { WishlistProvider } from '@/store/wishlistStore';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import localFont from "next/font/local";
@@ -23,13 +24,15 @@ export default function RootLayout({ children }) {
       <body className={`${geistSans.variable} min-h-screen bg-base-100 flex flex-col`}>
         <ToastProvider>
           <CartProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Navbar />
-            </Suspense>
-            <main className="container mx-auto px-4 py-8 flex-grow">
-              {children}
-            </main>
-            <Footer />
+            <WishlistProvider>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Navbar />
+              </Suspense>
+              <main className="container mx-auto px-4 py-8 flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </WishlistProvider>
           </CartProvider>
         </ToastProvider>
       </body>

@@ -1,12 +1,14 @@
 "use client";
 
 import { useCart } from '@/store/cartStore';
+import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
 import CartItem from '@/components/cart/CartItem';
 import { useEffect } from 'react';
 
 export default function CartPage() {
   const { items, loading, fetchCart, updateQuantity, removeItem } = useCart();
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchCart();
@@ -15,6 +17,24 @@ export default function CartPage() {
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = 10; // Fixed shipping cost
   const total = subtotal + shipping;
+
+  const handleUpdateQuantity = async (productId, quantity) => {
+    try {
+      await updateQuantity(productId, quantity);
+      showToast('Cart updated', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
+  const handleRemoveItem = async (productId) => {
+    try {
+      await removeItem(productId);
+      showToast('Item removed from cart', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
 
   if (loading) {
     return (
@@ -60,8 +80,8 @@ export default function CartPage() {
                   <CartItem
                     key={item.productId}
                     item={item}
-                    onUpdateQuantity={updateQuantity}
-                    onRemove={removeItem}
+                    onUpdateQuantity={handleUpdateQuantity}
+                    onRemove={handleRemoveItem}
                   />
                 ))}
               </div>

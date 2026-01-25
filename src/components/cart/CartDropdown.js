@@ -1,12 +1,14 @@
 "use client";
 
 import { useCart } from '@/store/cartStore';
+import { useToast } from '@/components/ui/Toast';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CartItemSkeleton, EmptyState, ErrorState } from '@/components/ui/SkeletonLoader';
 
 export default function CartDropdown({ isOpen, onClose }) {
   const { items, loading, error, removeItem, updateQuantity } = useCart();
+  const { showToast } = useToast();
 
   const subtotal = items.reduce((sum, item) => 
     sum + (item.price * item.quantity), 0
@@ -74,7 +76,14 @@ export default function CartDropdown({ isOpen, onClose }) {
                   <div className="flex items-center gap-2 mt-1">
                     <button 
                       className="btn btn-xs"
-                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      onClick={async () => {
+                        try {
+                          await updateQuantity(item.productId, item.quantity - 1);
+                          showToast('Cart updated', 'success');
+                        } catch (error) {
+                          showToast(error.message, 'error');
+                        }
+                      }}
                       disabled={item.quantity <= 1 || loading}
                     >
                       -
@@ -82,7 +91,14 @@ export default function CartDropdown({ isOpen, onClose }) {
                     <span>{item.quantity}</span>
                     <button 
                       className="btn btn-xs"
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={async () => {
+                        try {
+                          await updateQuantity(item.productId, item.quantity + 1);
+                          showToast('Cart updated', 'success');
+                        } catch (error) {
+                          showToast(error.message, 'error');
+                        }
+                      }}
                       disabled={loading}
                     >
                       +
@@ -90,7 +106,14 @@ export default function CartDropdown({ isOpen, onClose }) {
                   </div>
                 </div>
                 <button 
-                  onClick={() => removeItem(item.productId)}
+                  onClick={async () => {
+                    try {
+                      await removeItem(item.productId);
+                      showToast('Item removed from cart', 'success');
+                    } catch (error) {
+                      showToast(error.message, 'error');
+                    }
+                  }}
                   className="btn btn-ghost btn-sm"
                   disabled={loading}
                 >

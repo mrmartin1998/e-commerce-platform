@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import ThemeSwitcher from './ThemeSwitcher';
+import WishlistIcon from '@/components/wishlist/WishlistIcon';
+import { useCart } from '@/store/cartStore';
 import { useState, useEffect, useCallback } from 'react';
 
 export default function Navbar() {
@@ -9,6 +11,9 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { items } = useCart();
+
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -84,7 +89,7 @@ export default function Navbar() {
             <li><Link href="/categories" onClick={toggleMobileMenu}>Categories</Link></li>
             */}
             <li><Link href="/cart" onClick={toggleMobileMenu}>Cart</Link></li>
-            
+            <li><Link href="/wishlist" onClick={toggleMobileMenu}>Wishlist</Link></li>
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">E-Commerce</Link>
@@ -96,7 +101,17 @@ export default function Navbar() {
           {/* 
           <li><Link href="/categories">Categories</Link></li>
           */}
-          <li><Link href="/cart">Cart</Link></li>
+          <li>
+            <Link href="/cart" className="indicator">
+              Cart
+              {cartItemCount > 0 && (
+                <span className="badge badge-sm badge-primary indicator-item">
+                  {cartItemCount}
+                </span>
+              )}
+            </Link>
+          </li>
+          <li><WishlistIcon /></li>
         </ul>
       </div>
       
