@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/middleware/auth';
 import { Order } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
+import { 
+  sendOrderProcessing, 
+  sendOrderShipped, 
+  sendOrderDelivered, 
+  sendOrderCancelled 
+} from '@/lib/email';
 
 // GET single order
 export const GET = requireAuth(async function getHandler(request, context) {
@@ -123,6 +129,42 @@ export const PATCH = requireAuth(async function patchHandler(request, context) {
       { path: 'items.productId', select: 'name price images' },
       { path: 'statusHistory.updatedBy', select: 'name email' }
     ]);
+
+    // Send status update email to customer
+    try {
+      if (order.userId && order.userId.email) {
+        const customerEmail = order.userId.email;
+        
+        switch (status) {
+          case 'processing':
+            console.log(`📧 Sending processing email for order #${order._id}`);
+            await sendOrderProcessing(order, customerEmail);
+            break;
+          
+          case 'shipped':
+            console.log(`📧 Sending shipped email for order #${order._id}`);
+            await sendOrderShipped(order, customerEmail);
+            break;
+          
+          case 'delivered':
+            console.log(`📧 Sending delivered email for order #${order._id}`);
+            await sendOrderDelivered(order, customerEmail);
+            break;
+          
+          case 'cancelled':
+            console.log(`📧 Sending cancelled email for order #${order._id}`);
+            await sendOrderCancelled(order, customerEmail);
+            break;
+          
+          // No email for 'pending' status (order confirmation handles that)
+        }
+      } else {
+        console.warn(`⚠️  Cannot send email - user email not found for order #${order._id}`);
+      }
+    } catch (emailError) {
+      // Log error but don't fail the status update
+      console.error('❌ Failed to send status update email:', emailError.message);
+    }
 
     return NextResponse.json(order);
   } catch (error) {

@@ -11,9 +11,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongoose';
+import connectDB from '@/lib/db/mongoose';
 import { Review, Product } from '@/lib/models';
-import { verifyAdmin } from '@/lib/middleware/adminAuth';
+import { requireAdmin } from '@/lib/middleware/adminAuth';
 
 /**
  * PUT /api/admin/reviews/[id]
@@ -24,20 +24,12 @@ import { verifyAdmin } from '@/lib/middleware/adminAuth';
  * - comment: (optional) Edit the review text
  * - rating: (optional) Edit the rating
  */
-export async function PUT(request, { params }) {
+export const PUT = requireAdmin(async function putHandler(request, context) {
   try {
-    // STEP 1: Admin authentication check
-    const adminCheck = await verifyAdmin(request);
-    if (!adminCheck.valid) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 401 }
-      );
-    }
-
     await connectDB();
 
-    // STEP 2: Get review ID from URL params
+    // Get review ID from URL params (Next.js 15 requires await)
+    const params = await context.params;
     const { id } = params;
     
     // STEP 3: Parse request body
@@ -100,7 +92,7 @@ export async function PUT(request, { params }) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * DELETE /api/admin/reviews/[id]
@@ -112,20 +104,12 @@ export async function PUT(request, { params }) {
  * - Fake reviews
  * - Violates policies
  */
-export async function DELETE(request, { params }) {
+export const DELETE = requireAdmin(async function deleteHandler(request, context) {
   try {
-    // STEP 1: Admin authentication check
-    const adminCheck = await verifyAdmin(request);
-    if (!adminCheck.valid) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 401 }
-      );
-    }
-
     await connectDB();
 
-    // STEP 2: Get review ID from URL
+    // Get review ID from URL (Next.js 15 requires await)
+    const params = await context.params;
     const { id } = params;
 
     // STEP 3: Find and delete review
@@ -159,4 +143,4 @@ export async function DELETE(request, { params }) {
       { status: 500 }
     );
   }
-}
+});

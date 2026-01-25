@@ -4,6 +4,7 @@ import { requireAuth } from '@/lib/middleware/auth';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import mongoose from 'mongoose';
+import { sendOrderConfirmation } from '@/lib/email';
 
 let stripeClient;
 function getStripeClient() {
@@ -120,6 +121,24 @@ export const GET = requireAuth(async function getHandler(request) {
 
       // Commit transaction
       await mongoSession.commitTransaction();
+      
+      // Send order confirmation email
+      try {
+        const populatedOrder = await Order.findById(order[0]._id)
+          .populate('userId', 'name email')
+          .populate('items.productId', 'name price images');
+        
+        if (populatedOrder?.userId?.email) {
+          console.log(`📧 Sending order confirmation email for order #${populatedOrder._id}`);
+          await sendOrderConfirmation(populatedOrder, populatedOrder.userId.email);
+        } else {
+          console.warn(`⚠️  Cannot send email - user email not found for order #${order[0]._id}`);
+        }
+      } catch (emailError) {
+        // Log error but don't fail the order creation
+        console.error('❌ Failed to send order confirmation email:', emailError.message);
+      }
+      
       return NextResponse.json(order[0]);
 
     } catch (error) {

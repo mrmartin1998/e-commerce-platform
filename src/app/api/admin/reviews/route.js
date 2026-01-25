@@ -13,9 +13,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongoose';
+import connectDB from '@/lib/db/mongoose';
 import { Review } from '@/lib/models';
-import { verifyAdmin } from '@/lib/middleware/adminAuth';
+import { requireAdmin } from '@/lib/middleware/adminAuth';
 
 /**
  * GET /api/admin/reviews
@@ -32,18 +32,8 @@ import { verifyAdmin } from '@/lib/middleware/adminAuth';
  * - Different data (includes unapproved reviews)
  * - Different pagination (admins might want to see more at once)
  */
-export async function GET(request) {
+export const GET = requireAdmin(async function getHandler(request) {
   try {
-    // STEP 1: Verify admin authentication
-    // Only admins can see all reviews (including pending/unapproved)
-    const adminCheck = await verifyAdmin(request);
-    if (!adminCheck.valid) {
-      return NextResponse.json(
-        { error: 'Admin access required' },
-        { status: 401 }
-      );
-    }
-
     await connectDB();
 
     // STEP 2: Parse query parameters
@@ -106,4 +96,4 @@ export async function GET(request) {
       { status: 500 }
     );
   }
-}
+});
