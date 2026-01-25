@@ -122,18 +122,17 @@ export const GET = requireAuth(async function getHandler(request) {
       // Commit transaction
       await mongoSession.commitTransaction();
       
-      // Populate order data for email
-      const populatedOrder = await Order.findById(order[0]._id)
-        .populate('userId', 'name email')
-        .populate('items.productId', 'name price images');
-      
       // Send order confirmation email
       try {
-        if (populatedOrder.userId && populatedOrder.userId.email) {
+        const populatedOrder = await Order.findById(order[0]._id)
+          .populate('userId', 'name email')
+          .populate('items.productId', 'name price images');
+        
+        if (populatedOrder?.userId?.email) {
           console.log(`📧 Sending order confirmation email for order #${populatedOrder._id}`);
           await sendOrderConfirmation(populatedOrder, populatedOrder.userId.email);
         } else {
-          console.warn(`⚠️  Cannot send email - user email not found for order #${populatedOrder._id}`);
+          console.warn(`⚠️  Cannot send email - user email not found for order #${order[0]._id}`);
         }
       } catch (emailError) {
         // Log error but don't fail the order creation
