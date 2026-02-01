@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Product, Category } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
-import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { requirePermission } from '@/lib/middleware/roleAuth';
+import { logBulkActivity } from '@/lib/utils/activityLogger';
 
 /**
  * POST /api/admin/products/bulk-update-category
@@ -20,7 +21,7 @@ import { requireAdmin } from '@/lib/middleware/adminAuth';
  *   message: "3 products moved to Electronics"
  * }
  */
-export const POST = requireAdmin(async function(request) {
+export const POST = requirePermission('bulk_update', 'Product')(async function(request) {
   try {
     await connectDB();
     
@@ -59,6 +60,20 @@ export const POST = requireAdmin(async function(request) {
       { _id: { $in: productIds } },
       { $set: { category } }
     );
+
+    // Log activity
+    await logBulkActivity({
+      userId: request.user._id,
+      action: 'BULK_UPDATE',
+      resource: 'Product',
+      resourceIds: productIds,
+      details: { 
+        count: result.modifiedCount,
+        field: 'category',
+        newValue: categoryDoc.name
+      },
+      request
+    });
 
     return NextResponse.json({
       success: true,

@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
 import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { requirePermission } from '@/lib/middleware/roleAuth';
 import { verifyAuth } from '@/lib/middleware/auth';
+import { logActivity } from '@/lib/utils/activityLogger';
 
 export async function GET(request) {
   try {
@@ -126,6 +128,20 @@ export const POST = requireAdmin(async function(request) {
     const product = await Product.create({
       ...productData,
       createdBy: request.user._id
+    });
+
+    // Log activity
+    await logActivity({
+      userId: request.user._id,
+      action: 'CREATE',
+      resource: 'Product',
+      resourceId: product._id,
+      details: {
+        name: product.name,
+        price: product.price,
+        category: product.category
+      },
+      request
     });
 
     return NextResponse.json({ 
