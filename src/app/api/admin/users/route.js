@@ -1,9 +1,9 @@
 import { User } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
-import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { requireRole } from '@/lib/middleware/roleAuth';
 import { NextResponse } from 'next/server';
 
-export const GET = requireAdmin(async function(request) {
+export const GET = requireRole(['super_admin'])(async function(request) {
   try {
     await connectDB();
     
