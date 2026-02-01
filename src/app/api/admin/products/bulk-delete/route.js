@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Product } from '@/lib/models';
 import connectDB from '@/lib/db/mongoose';
-import { requireAdmin } from '@/lib/middleware/adminAuth';
+import { requirePermission } from '@/lib/middleware/roleAuth';
+import { logBulkActivity } from '@/lib/utils/activityLogger';
 
 /**
  * POST /api/admin/products/bulk-delete
@@ -19,7 +20,7 @@ import { requireAdmin } from '@/lib/middleware/adminAuth';
  *   message: "3 products deleted successfully"
  * }
  */
-export const POST = requireAdmin(async function(request) {
+export const POST = requirePermission('bulk_delete', 'Product')(async function(request) {
   try {
     await connectDB();
     
@@ -36,6 +37,16 @@ export const POST = requireAdmin(async function(request) {
     // Perform bulk delete
     const result = await Product.deleteMany({
       _id: { $in: productIds }
+    });
+
+    // Log activity
+    await logBulkActivity({
+      userId: request.user._id,
+      action: 'BULK_DELETE',
+      resource: 'Product',
+      resourceIds: productIds,
+      details: { count: result.deletedCount },
+      request
     });
 
     return NextResponse.json({

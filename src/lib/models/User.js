@@ -21,8 +21,18 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'viewer', 'editor', 'admin', 'super_admin'],
     default: 'user'
+  },
+  // Role assignment metadata for audit trail
+  roleAssignedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  roleAssignedAt: {
+    type: Date,
+    default: null
   },
   addresses: [{
     street: String,

@@ -526,13 +526,35 @@ Send automated emails for orders and notifications.
 **Estimated Time:** 6-8 hours  
 **Labels:** `medium`, `feature`, `security`, `admin`
 
+**Description:**
+Add enterprise-grade RBAC system with 4-tier role hierarchy, granular permissions, and complete activity audit trail.
+
 **Tasks:**
-- [ ] Define role system (Super Admin, Admin, Editor, Viewer)
-- [ ] Create permission middleware
-- [ ] Add role assignment UI
-- [ ] Update API routes with permission checks
-- [ ] Create activity logging system
-- [ ] Test all permission scenarios
+- [x] Define role system (Super Admin, Admin, Editor, Viewer)
+- [x] Create permission middleware (roleAuth.js with 4 middleware types)
+- [x] Add role assignment UI (UserManagement + RoleAssignmentModal)
+- [x] Update API routes with permission checks
+- [x] Create activity logging system (ActivityLog model + 8 utility functions)
+- [x] Test all permission scenarios
+
+**Acceptance Criteria:**
+- ✅ 4-tier role hierarchy (Super Admin > Admin > Editor > Viewer)
+- ✅ 22 granular permissions across 6 resource types
+- ✅ Permission matrix centralized in adminPermissions.js
+- ✅ 4 middleware types (requireRole, requirePermission, requireMinimumRole, requireAdmin)
+- ✅ User Management page (Super Admin only) with search/filter
+- ✅ Role assignment modal with permission preview
+- ✅ Activity logging for all critical actions (CRUD, bulk ops, role changes)
+- ✅ Activity Log viewer with filtering (action, resource, date, user)
+- ✅ Auto-cleanup after 180 days via MongoDB TTL
+- ✅ Role badges in navigation dropdown
+- ✅ Permission-based menu visibility
+- ✅ Safeguards: cannot change own role, cannot demote last Super Admin
+- ✅ Backward compatibility with isAdmin flag
+- ✅ All bulk operations updated with permission checks
+- ✅ Complete documentation (implementation guide + testing checklist)
+
+**Status:** ✅ COMPLETED - Full RBAC system with 4 roles, 22 permissions, activity audit trail, user management UI, and comprehensive security safeguards
 
 ---
 

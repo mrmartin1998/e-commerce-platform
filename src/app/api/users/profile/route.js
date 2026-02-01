@@ -19,9 +19,10 @@ export const GET = requireAuth(async function(request) {
       );
     }
 
-    // Explicitly set isAdmin based on role or isAdmin field
+    // Explicitly set isAdmin based on role (any admin-level role)
     const userData = user.toObject();
-    userData.isAdmin = user.isAdmin || user.role === 'admin';
+    const adminRoles = ['viewer', 'editor', 'admin', 'super_admin'];
+    userData.isAdmin = user.isAdmin || adminRoles.includes(user.role);
 
     return NextResponse.json({ 
       user: userData
