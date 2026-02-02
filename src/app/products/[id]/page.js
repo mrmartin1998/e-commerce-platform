@@ -9,6 +9,8 @@ import AddToWishlistButton from '@/components/products/AddToWishlistButton';
 import { useCart } from '@/store/cartStore';
 import ReviewForm from '@/components/products/ReviewForm';
 import ReviewList from '@/components/products/ReviewList';
+import RecentlyViewed from '@/components/products/RecentlyViewed';
+import { addToRecentlyViewed } from '@/lib/utils/recentlyViewed';
 
 async function getProduct(id) {
   const res = await fetch(`/api/products/${id}`);
@@ -36,7 +38,15 @@ export default function ProductDetailPage() {
   useEffect(() => {
     if (params?.id) {
       getProduct(params.id)
-        .then(data => setProduct(data.product))
+        .then(data => {
+          const productData = data.product;
+          setProduct(productData);
+          
+          // Track product view in recently viewed
+          if (productData) {
+            addToRecentlyViewed(productData);
+          }
+        })
         .finally(() => setLoading(false));
       
       // Check review access
@@ -342,6 +352,15 @@ export default function ProductDetailPage() {
             refreshKey={refreshReviews}
           />
         </div>
+      </div>
+
+      {/* Recently Viewed Products */}
+      <div className="mt-12">
+        <RecentlyViewed 
+          title="Recently Viewed Products" 
+          excludeIds={[product._id]}
+          limit={5}
+        />
       </div>
     </div>
   );

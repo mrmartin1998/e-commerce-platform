@@ -564,12 +564,22 @@ Add enterprise-grade RBAC system with 4-tier role hierarchy, granular permission
 **Labels:** `medium`, `feature`, `user-experience`
 
 **Tasks:**
-- [ ] Track product views in localStorage
-- [ ] Create recently viewed component
-- [ ] Display on homepage
-- [ ] Display on product pages
-- [ ] Limit to last 10 products
-- [ ] Clear old entries automatically
+- [x] Track product views in localStorage
+- [x] Create recently viewed component
+- [x] Display on homepage
+- [x] Display on product pages
+- [x] Limit to last 10 products
+- [x] Clear old entries automatically
+
+**Acceptance Criteria:**
+- ✅ Product views tracked in localStorage with deduplication
+- ✅ RecentlyViewed component displays on homepage and product pages
+- ✅ FIFO behavior: maintains last 10 products viewed
+- ✅ Current product excluded on product detail pages
+- ✅ Responsive grid layout (2/3/5 columns)
+- ✅ SSR-safe implementation
+
+**Status:** ✅ COMPLETED - localStorage-based tracking with horizontal scrolling display on 2 locations
 
 ---
 
