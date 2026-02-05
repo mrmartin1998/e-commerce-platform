@@ -17,10 +17,10 @@ export default function CartDropdown({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="dropdown-content z-[1] menu p-4 shadow bg-base-100 rounded-box w-80 absolute right-0 top-full mt-2">
+    <div className="dropdown-content z-[1] menu p-4 shadow bg-base-100 rounded-box w-screen max-w-md md:w-96 absolute right-0 top-full mt-2">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold text-lg">Cart ({items.length})</h3>
-        <button onClick={onClose} className="btn btn-ghost btn-sm">×</button>
+        <button onClick={onClose} className="btn btn-ghost btn-sm min-w-[44px] min-h-[44px]">×</button>
       </div>
 
       {/* Loading State */}
@@ -75,7 +75,7 @@ export default function CartDropdown({ isOpen, onClose }) {
                   <p className="text-sm">${item.price}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <button 
-                      className="btn btn-xs"
+                      className="btn btn-xs min-w-[36px] min-h-[36px]"
                       onClick={async () => {
                         try {
                           await updateQuantity(item.productId, item.quantity - 1);
@@ -88,9 +88,9 @@ export default function CartDropdown({ isOpen, onClose }) {
                     >
                       -
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="min-w-[24px] text-center">{item.quantity}</span>
                     <button 
-                      className="btn btn-xs"
+                      className="btn btn-xs min-w-[36px] min-h-[36px]"
                       onClick={async () => {
                         try {
                           await updateQuantity(item.productId, item.quantity + 1);
@@ -114,7 +114,7 @@ export default function CartDropdown({ isOpen, onClose }) {
                       showToast(error.message, 'error');
                     }
                   }}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-ghost btn-sm min-w-[44px] min-h-[44px]"
                   disabled={loading}
                 >
                   ×
@@ -132,7 +132,7 @@ export default function CartDropdown({ isOpen, onClose }) {
             </div>
             <Link 
               href="/checkout" 
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full min-h-[48px]"
               onClick={onClose}
             >
               {loading ? (

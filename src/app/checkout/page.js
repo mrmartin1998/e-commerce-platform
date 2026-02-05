@@ -119,21 +119,26 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] p-4">
+    <div className="min-h-[calc(100vh-4rem)] p-4 pb-24 md:pb-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Checkout</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Order Summary */}
-          <div className="lg:col-span-2">
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Order Summary</h2>
+          <div className="lg:col-span-2 space-y-4">
+            {/* Collapsible on mobile, regular card on desktop */}
+            <div className="collapse md:collapse-open collapse-arrow md:collapse-plus bg-base-100 shadow-xl md:card">
+              <input type="checkbox" defaultChecked className="md:hidden" />
+              <div className="collapse-title text-xl font-bold md:hidden">
+                Order Summary ({items.length} items)
+              </div>
+              <div className="collapse-content md:card-body">
+                <h2 className="card-title hidden md:block">Order Summary</h2>
                 <div className="divider"></div>
                 
                 {items.map((item) => (
-                  <div key={item.productId} className="flex items-center gap-6 mb-4">
-                    <div className="w-20 h-20 relative shrink-0">
+                  <div key={item.productId} className="flex items-center gap-4 md:gap-6 mb-4">
+                    <div className="w-24 h-24 md:w-28 md:h-28 relative shrink-0">
                       <Image
                         src={item.image || '/images/placeholder.png'}
                         alt={item.name}
@@ -153,19 +158,43 @@ export default function CheckoutPage() {
                   </div>
                 ))}
                 
-                <div className="divider"></div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
+                {/* Totals - Only show on desktop inside collapsible */}
+                <div className="hidden md:block">
+                  <div className="divider"></div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>${subtotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Shipping</span>
+                      <span>${shipping.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total</span>
+                      <span>${total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Totals Card - Always visible on mobile, hidden on desktop */}
+            <div className="card bg-base-100 shadow-xl md:hidden">
+              <div className="card-body p-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-base">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span className="font-semibold">${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-base">
                     <span>Shipping</span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span className="font-semibold">${shipping.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between font-bold">
+                  <div className="divider my-2"></div>
+                  <div className="flex justify-between font-bold text-xl">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span className="text-primary">${total.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -176,7 +205,7 @@ export default function CheckoutPage() {
               <div className="card-body">
                 <div className="flex justify-between items-center">
                   <h2 className="card-title">Shipping Address</h2>
-                  <Link href="/profile" className="btn btn-ghost btn-sm">
+                  <Link href="/profile" className="btn btn-ghost btn-sm md:btn-md min-h-[44px]">
                     Manage Addresses
                   </Link>
                 </div>
@@ -191,19 +220,19 @@ export default function CheckoutPage() {
                           ${selectedAddress?._id === address._id ? 'ring-2 ring-primary' : ''}`}
                         onClick={() => setSelectedAddress(address)}
                       >
-                        <div className="card-body p-4">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p>{address.street}</p>
-                              <p>{address.city}, {address.state} {address.zipCode}</p>
-                              <p>{address.country}</p>
+                        <div className="card-body p-4 md:p-6">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <p className="font-medium">{address.street}</p>
+                              <p className="text-sm md:text-base">{address.city}, {address.state} {address.zipCode}</p>
+                              <p className="text-sm md:text-base">{address.country}</p>
                               {address.isDefault && (
                                 <span className="badge badge-primary mt-2">Default</span>
                               )}
                             </div>
                             <input 
                               type="radio"
-                              className="radio radio-primary"
+                              className="radio radio-primary radio-lg md:radio-md"
                               checked={selectedAddress?._id === address._id}
                               onChange={() => setSelectedAddress(address)}
                             />
@@ -225,17 +254,17 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment */}
-          <div className="card bg-base-100 shadow-xl h-fit">
-            <div className="card-body">
-              <h2 className="card-title">Payment</h2>
-              <div className="divider"></div>
+          <div className="fixed bottom-0 left-0 right-0 bg-base-100 p-4 shadow-lg z-40 md:relative md:shadow-xl md:p-0 md:card md:h-fit">
+            <div className="md:card-body">
+              <h2 className="card-title hidden md:block">Payment</h2>
+              <div className="divider hidden md:block"></div>
               {error && (
                 <div className="alert alert-error mb-4">
                   {error}
                 </div>
               )}
               <button 
-                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                className={`btn btn-primary w-full min-h-[48px] ${loading ? 'loading' : ''}`}
                 onClick={handleCheckout}
                 disabled={loading}
               >

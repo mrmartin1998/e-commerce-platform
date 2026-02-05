@@ -703,6 +703,563 @@ Start with **Phase 1** (Navigation) and **Phase 5** (Touch Targets) as they impa
 
 ---
 
-*Last Updated: February 2, 2026*
+## 📋 MOBILE TESTING GUIDE - SCREEN BY SCREEN
+
+### **HOW TO TEST:**
+1. Open Chrome DevTools (F12)
+2. Click "Toggle device toolbar" (Ctrl+Shift+M)
+3. Select device or set custom dimensions
+4. Test each screen below
+5. Check all items in the checklist
+6. Test in both portrait and landscape
+7. Test actual device if possible
+
+---
+
+### **🏠 SCREEN 1: HOMEPAGE** (`/`)
+**URL:** `http://localhost:3000/`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [ ] iPad (768x1024) - Tablet
+
+#### **What to Check:**
+
+##### **Hero Section:**
+- [X] Heading text size reduces on mobile (not too large)
+- [X] "Start Shopping" button is at least 48px tall
+- [X] "Register" button is at least 48px tall
+- [X] "Sign In" button is at least 48px tall
+- [X] Buttons stack vertically on very small screens
+- [X] All buttons are tappable without zoom
+- [X] Buttons have proper spacing (no accidental taps)
+
+##### **Recently Viewed Section:**
+- [X] Horizontal scroll works smoothly
+- [X] Product cards are visible and well-spaced
+- [X] "Clear" button (if shown) is easily tappable
+- [X] No horizontal page scroll (only intentional card scroll)
+
+#### **Test Scenarios:**
+1. **Tap each button** - Should respond immediately
+2. **Resize from desktop → mobile** - Layout should adapt smoothly
+3. **Rotate device** - Both orientations should work
+4. **Scroll recently viewed** - Smooth horizontal scroll
+
+---
+
+### **🛍️ SCREEN 2: PRODUCTS PAGE** (`/products`)
+**URL:** `http://localhost:3000/products`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [ ] iPhone SE (375x667)
+- [ ] iPhone 14 (390x844)
+- [ ] Samsung Galaxy (360x800)
+
+#### **What to Check:**
+
+##### **Top Bar:**
+- [X] Page title scales properly on mobile
+- [X] Search bar is full-width on mobile
+- [X] Grid/List view toggle buttons are ≥44px tall
+- [X] Both toggle buttons are easily tappable
+
+##### **Filters Sidebar:**
+- [X] **Filters are collapsible on mobile** ✨ (NEW)
+- [X] "Filters & Sort" title shows on mobile
+- [X] Clicking expands/collapses filters
+- [X] Category dropdown is ≥48px tall
+- [X] Min/Max price inputs are ≥44px tall
+- [X] Sort dropdown is ≥48px tall
+- [X] "Clear Filters" button is ≥44px tall
+- [X] All dropdowns are easy to tap
+
+##### **Product Grid:**
+- [X] 1 column on mobile (stacked vertically)
+- [X] 2 columns on small tablets
+- [X] Product cards have adequate spacing
+- [X] Images load properly
+- [X] "Add to Cart" buttons on cards are tappable
+
+##### **Pagination:**
+- [X] Page numbers are adequately spaced
+- [X] Previous/Next buttons are ≥44px
+- [X] No accidental page changes
+
+#### **Test Scenarios:**
+1. **Open filters** - Tap "Filters & Sort" accordion
+2. **Change category** - Dropdown should be easy to use
+3. **Enter price range** - Input fields should not cause zoom
+4. **Switch view** - Tap Grid/List toggle
+5. **Scroll products** - Smooth vertical scroll
+6. **Pagination** - Navigate between pages
+
+---
+
+### **📦 SCREEN 3: PRODUCT DETAIL** (`/products/[id]`)
+**URL:** `http://localhost:3000/products/[any-product-id]`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Image Gallery:**
+- [X] Main image displays properly
+- [X] Previous button (❮) is ≥44x44px ✨ (FIXED)
+- [X] Next button (❯) is ≥44x44px ✨ (FIXED)
+- [X] Image counter visible (e.g., "2 / 5")
+- [X] Thumbnail buttons are ≥88x88px ✨ (FIXED)
+- [X] Thumbnails are easily tappable
+- [X] Selected thumbnail has visual indicator
+
+##### **Product Info:**
+- [X] Product title is readable (not too large)
+- [X] Price is clearly visible
+- [X] Description is readable
+- [X] Stock count is visible
+
+##### **Quantity Selector:**
+- [X] Minus button is ≥44x44px ✨ (FIXED)
+- [X] Plus button is ≥44x44px ✨ (FIXED)
+- [X] Quantity number is visible
+- [X] Buttons are easy to tap
+
+##### **Action Buttons:**
+- [X] "Add to Cart" button is ≥48px tall ✨ (FIXED)
+- [X] "Add to Cart" button is full-width or nearly full
+- [X] Wishlist button is ≥48x48px ✨ (FIXED)
+- [X] No accidental taps between buttons
+
+##### **Reviews Section:**
+- [X] Review cards are readable
+- [X] Submit review button (if shown) is tappable
+- [X] Star ratings are visible
+
+#### **Test Scenarios:**
+1. **Navigate images** - Tap prev/next arrows
+2. **Select thumbnail** - Tap different thumbnails
+3. **Change quantity** - Tap +/- buttons multiple times
+4. **Add to cart** - Tap main button
+5. **Add to wishlist** - Tap heart icon
+6. **Scroll page** - Smooth vertical scroll
+7. **Rotate device** - Layout adapts properly
+
+---
+
+### **🛒 SCREEN 4: CART PAGE** (`/cart`)
+**URL:** `http://localhost:3000/cart`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Cart Items:**
+- [X] Product images are ≥80px (visible) ✨ (FIXED)
+- [X] Product name is readable
+- [X] Quantity minus button is ≥44x44px ✨ (FIXED)
+- [X] Quantity plus button is ≥44x44px ✨ (FIXED)
+- [X] Remove (×) button is ≥44x44px ✨ (FIXED)
+- [X] Adequate spacing between items
+- [X] No accidental taps
+
+##### **Order Summary:**
+- [X] NOT sticky on mobile (scrolls with page) ✨ (FIXED)
+- [X] Subtotal is visible
+- [X] Shipping cost is visible
+- [X] Total is bold and prominent
+- [X] "Proceed to Checkout" button STICKY at bottom ✨ (FIXED)
+- [X] "Continue Shopping" button is ≥48px tall ✨ (FIXED)
+
+##### **Layout:**
+- [X] Single column on mobile
+- [X] Two columns on tablet/desktop
+- [X] Bottom padding prevents content from being hidden
+
+#### **Test Scenarios:**
+1. **Scroll page** - Checkout button should remain visible at bottom
+2. **Increase quantity** - Tap + button
+3. **Decrease quantity** - Tap - button
+4. **Remove item** - Tap × button
+5. **Tap checkout** - Sticky button should work
+6. **Tap continue shopping** - Should navigate to products
+
+---
+
+### **💳 SCREEN 5: CHECKOUT PAGE** (`/checkout`)
+**URL:** `http://localhost:3000/checkout`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667) ⭐ Critical
+
+#### **What to Check:**
+
+##### **Order Summary (Collapsible):**
+- [X] Order Summary COLLAPSIBLE on mobile ✨ (FIXED)
+- [X] Shows "Order Summary (X items)" title on mobile
+- [X] Tap to expand/collapse
+- [X] Starts expanded by default
+- [X] Product images are ≥120px on mobile ✨ (FIXED)
+- [X] Product names are readable
+- [X] Prices are visible
+- [X] Subtotal/Shipping/Total are clear
+
+##### **Shipping Address:**
+- [X] Address cards stack vertically
+- [X] Radio buttons are larger (radio-lg) ✨ (FIXED)
+- [X] Address text is readable
+- [X] Default badge is visible
+- [X] Cards have adequate spacing
+- [X] Tapping card OR radio selects it
+- [X] Selected card has visual indicator (ring)
+- [X] "Manage Addresses" button is ≥44px ✨ (FIXED)
+
+##### **Payment Button:**
+- [X] Button is STICKY at bottom on mobile ✨ (FIXED)
+- [X] Button is ≥48px tall ✨ (FIXED)
+- [X] Button is full-width
+- [X] Button has shadow/visual elevation
+- [X] Always visible while scrolling
+- [X] On desktop, button is in normal flow
+
+##### **Layout:**
+- [X] Page has bottom padding (pb-24) ✨ (FIXED)
+- [X] Content doesn't hide behind sticky button
+- [X] Single column on mobile
+- [X] Three columns on desktop (2 + 1)
+
+#### **Test Scenarios:**
+1. **Collapse order summary** - Tap to close, tap to reopen
+2. **Select address** - Tap different address cards
+3. **Scroll page** - Payment button stays at bottom
+4. **Add address** - Tap "Manage Addresses"
+5. **Proceed to payment** - Tap sticky button
+6. **Rotate device** - Layout adapts properly
+
+---
+
+### **🔍 SCREEN 6: NAVBAR (All Pages)**
+**URL:** Any page
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Mobile Menu (Hamburger):**
+- [X] Hamburger button is ≥44x44px ✨ (FIXED)
+- [X] Tapping opens dropdown menu
+- [X] Dropdown width is ≥256px (w-64) ✨ (FIXED)
+- [X] "Products" link is visible
+- [X] "Cart" link shows badge with count ✨ (FIXED)
+- [X] "Wishlist" link is visible
+- [X] All menu items are tappable
+- [X] Clicking outside closes menu
+
+##### **Profile Menu:**
+- [X] Profile button is ≥44x44px ✨ (FIXED)
+- [X] Tapping opens dropdown
+- [X] Dropdown width is ≥256px (w-64) ✨ (FIXED)
+- [X] Dropdown is scrollable (max-h-[80vh]) ✨ (FIXED)
+- [X] User name is visible
+- [X] Role badge is visible
+- [X] "Profile" link is tappable
+- [X] "Orders" link is tappable
+- [X] Admin links (if admin) are tappable
+- [X] "Logout" button is tappable
+- [X] Long admin menus don't overflow
+
+##### **Theme Switcher:**
+- [X] Select dropdown is ≥44px tall ✨ (FIXED)
+- [X] Dropdown is easy to tap
+- [X] Theme options are readable
+
+##### **Desktop Nav (lg:flex):**
+- [X] Hidden on mobile (< lg)
+- [X] Visible on desktop (≥ lg)
+- [X] Cart badge shows count
+- [X] All links are tappable
+
+#### **Test Scenarios:**
+1. **Open mobile menu** - Tap hamburger
+2. **Check cart badge** - Should show item count
+3. **Navigate to products** - Tap Products link
+4. **Open profile menu** - Tap profile avatar
+5. **Scroll profile menu** - Long admin menus should scroll
+6. **Change theme** - Tap theme switcher
+7. **Click outside** - Menus should close
+
+---
+
+### **🎨 SCREEN 7: CART DROPDOWN (Header)**
+**URL:** Any page (click cart icon)
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Dropdown Size:**
+- [X] Width is responsive (w-screen max-w-md) ✨ (FIXED)
+- [X] Doesn't overflow on iPhone SE
+- [X] Proper width on larger phones
+- [X] Close (×) button is ≥44x44px ✨ (FIXED)
+
+##### **Cart Items:**
+- [X] Product images are visible
+- [X] Product names are readable
+- [X] Quantity minus button is ≥36x36px ✨ (FIXED)
+- [X] Quantity plus button is ≥36x36px ✨ (FIXED)
+- [X] Remove (×) button is ≥44x44px ✨ (FIXED)
+- [X] Prices are visible
+
+##### **Actions:**
+- [X] Subtotal is visible
+- [X] "Checkout" button is ≥48px tall ✨ (FIXED)
+- [X] "Checkout" button is full-width
+- [X] Button is easily tappable
+
+#### **Test Scenarios:**
+1. **Open dropdown** - Tap cart icon in navbar
+2. **Change quantity** - Tap +/- buttons
+3. **Remove item** - Tap × button
+4. **Close dropdown** - Tap × button
+5. **Tap checkout** - Should navigate to checkout page
+
+---
+
+### **👤 SCREEN 8: PROFILE PAGE** (`/profile`)
+**URL:** `http://localhost:3000/profile`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Profile Form:**
+- [X] Input fields are readable
+- [X] Input fields don't cause zoom (16px min)
+- [X] Save button is ≥48px tall
+- [X] Form spacing is adequate
+
+##### **Address Cards:**
+- [X] Cards stack on mobile
+- [X] Address text is readable
+- [X] Edit button is ≥44px
+- [X] Delete button is ≥44px
+- [X] Add Address button is ≥44px
+
+##### **Modals (if opened):**
+- [X] AddressModal is full-width on mobile
+- [X] Form inputs are tappable
+- [X] Save/Cancel buttons are ≥44px
+
+#### **Test Scenarios:**
+1. **Edit profile** - Fill in fields
+2. **Add address** - Tap button, fill modal
+3. **Edit address** - Tap edit on card
+4. **Delete address** - Tap delete button
+
+---
+
+### **📋 SCREEN 9: ORDERS PAGE** (`/orders`)
+**URL:** `http://localhost:3000/orders`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [X] iPhone SE (375x667)
+
+#### **What to Check:**
+
+##### **Order Cards:**
+- [X] Cards are full-width on mobile
+- [X] Order number is readable
+- [X] Date is visible
+- [X] Status badge is visible
+- [X] Total amount is prominent
+- [X] "View Details" button is ≥44px
+- [X] Cards have adequate spacing
+
+##### **Order Details (if clicked):**
+- [X] Modal is full-width on mobile
+- [X] Product list is readable
+- [X] Shipping address is visible
+- [X] Close button is ≥44px
+
+#### **Test Scenarios:**
+1. **Scroll orders** - Smooth vertical scroll
+2. **View order** - Tap "View Details"
+3. **Close modal** - Tap close or outside
+
+---
+
+### **🔧 SCREEN 10: ADMIN DASHBOARD** (`/admin`)
+**URL:** `http://localhost:3000/admin`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [ ] iPhone 14 (390x844)
+- [ ] iPad (768x1024)
+
+#### **What to Check:**
+
+##### **Stats Cards:**
+- [ ] Cards stack on mobile (1 column)
+- [ ] 3 columns on tablet (md:grid-cols-3)
+- [ ] Numbers are visible
+- [ ] Icons are visible
+
+##### **Charts:**
+- [ ] Charts scale to mobile width
+- [ ] Charts are readable
+- [ ] No horizontal scroll
+
+##### **Quick Actions:**
+- [ ] Action buttons are ≥44px
+- [ ] Buttons are easily tappable
+- [ ] Adequate spacing
+
+#### **Test Scenarios:**
+1. **View stats** - All stats visible on mobile
+2. **Check charts** - Charts should be responsive
+3. **Tap actions** - Navigate to different admin pages
+
+---
+
+### **📦 SCREEN 11: ADMIN PRODUCTS** (`/admin/products`)
+**URL:** `http://localhost:3000/admin/products`
+
+#### **Desktop → Mobile Breakpoints to Test:**
+- [ ] iPhone 14 (390x844)
+- [ ] iPad (768x1024)
+
+#### **What to Check:**
+
+##### **Search & Filters:**
+- [ ] Search input is full-width on mobile
+- [ ] Filter buttons are ≥44px
+- [ ] Add Product button is ≥44px
+
+##### **Product Table/Cards:**
+- [ ] Table on desktop (≥md)
+- [ ] Cards on mobile (<md)
+- [ ] Product images visible on cards
+- [ ] Edit button is ≥44px
+- [ ] Delete button is ≥44px
+- [ ] Checkbox selection works
+
+##### **Bulk Actions:**
+- [ ] Bulk action bar is visible
+- [ ] Action buttons are tappable
+- [ ] Bar doesn't obstruct content
+
+#### **Test Scenarios:**
+1. **Search products** - Type in search
+2. **Select products** - Tap checkboxes
+3. **Bulk action** - Select multiple, tap action
+4. **Edit product** - Tap edit button
+5. **Add product** - Tap add button
+
+---
+
+### **✅ FINAL CHECKLIST - ALL SCREENS**
+
+#### **General Touch Targets:**
+- [ ] All buttons ≥44x44px (Apple minimum)
+- [ ] All inputs ≥48px tall
+- [ ] All dropdowns ≥48px tall
+- [ ] Icon-only buttons ≥44x44px
+- [ ] Close buttons (×) ≥44x44px
+
+#### **General Layout:**
+- [ ] No horizontal scroll (except intentional)
+- [ ] Content fits in viewport
+- [ ] Adequate padding on all sides
+- [ ] Proper spacing between elements
+- [ ] Text is readable (not too small)
+
+#### **General Interaction:**
+- [ ] All buttons respond to tap
+- [ ] No accidental taps (adequate spacing)
+- [ ] Smooth scrolling everywhere
+- [ ] Forms don't trigger zoom (16px min text)
+- [ ] Loading states are visible
+- [ ] Error states are readable
+
+#### **Performance:**
+- [ ] Pages load quickly
+- [ ] Images load progressively
+- [ ] No layout shift on load
+- [ ] Animations are smooth
+
+#### **Cross-Browser (Mobile):**
+- [ ] Safari iOS (iPhone/iPad)
+- [ ] Chrome Android
+- [ ] Firefox Mobile
+- [ ] Samsung Internet (if available)
+
+---
+
+## 📸 TESTING WORKFLOW
+
+### **Recommended Testing Order:**
+
+1. **Start Small → Large:**
+   - Test iPhone SE first (smallest)
+   - Then iPhone 14 (standard)
+   - Then iPad (tablet)
+   - Then desktop
+
+2. **Critical Paths First:**
+   - Homepage → Products → Product Detail → Cart → Checkout
+   - Test this flow completely on each device
+
+3. **Secondary Pages:**
+   - Profile, Orders, Wishlist
+   - Test after critical path works
+
+4. **Admin Pages Last:**
+   - Admin Dashboard, Products, Orders
+   - Most admins use desktop anyway
+
+5. **Real Device Testing:**
+   - Test on at least one real iPhone
+   - Test on at least one real Android
+   - Check actual tap targets (not just visual)
+
+---
+
+## 🐛 COMMON ISSUES TO WATCH FOR
+
+### **Touch Targets:**
+- ❌ Buttons too small (<44px)
+- ❌ Accidental taps on adjacent buttons
+- ❌ Icon-only buttons without labels
+
+### **Layout:**
+- ❌ Horizontal scroll when it shouldn't
+- ❌ Content hidden by sticky elements
+- ❌ Text overflow/truncation issues
+- ❌ Images too small to see
+
+### **Forms:**
+- ❌ Input zoom on focus (text <16px)
+- ❌ Dropdowns hard to tap
+- ❌ Submit buttons too small
+- ❌ Error messages not visible
+
+### **Navigation:**
+- ❌ Navbar overlaps content
+- ❌ Dropdown menus too narrow
+- ❌ Menu items too close together
+- ❌ Can't reach important buttons
+
+### **Performance:**
+- ❌ Images too large (slow load)
+- ❌ Layout shift on load
+- ❌ Choppy scrolling
+- ❌ Unresponsive buttons
+
+---
+
+*Last Updated: February 3, 2026*
 *Branch: feature/mobile-optimization*
 *Issue: #17*

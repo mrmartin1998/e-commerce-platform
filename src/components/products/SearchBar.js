@@ -45,35 +45,37 @@ function SearchBarContent({ onSearch, isLoading }) {
   };
 
   return (
-    <div className="relative">
-      <div className="form-control">
-        <div className="input-group">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="input input-bordered flex-1"
-            value={searchTerm}
-            onChange={handleInputChange}
-          />
-          {searchTerm && (
-            <button
-              onClick={handleClear}
-              className="btn btn-ghost btn-sm"
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
+    <div className="relative w-full">
+      <div className="flex items-center gap-0 border border-base-300 rounded-lg overflow-hidden bg-base-100 focus-within:outline focus-within:outline-2 focus-within:outline-primary">
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="input flex-1 border-0 focus:outline-none min-h-[44px] bg-transparent"
+          value={searchTerm}
+          onChange={handleInputChange}
+        />
+        {searchTerm && (
+          <button
+            onClick={handleClear}
+            className="btn btn-ghost btn-circle min-h-[44px] min-w-[44px] border-0"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
+        <button 
+          className="btn btn-ghost btn-square min-h-[44px] min-w-[44px] border-0"
+          type="button"
+          aria-label="Search"
+        >
+          {isLoading ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+            </svg>
           )}
-          <div className="btn btn-square">
-            {isLoading ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
-              </svg>
-            )}
-          </div>
-        </div>
+        </button>
       </div>
     </div>
   );
@@ -82,19 +84,21 @@ function SearchBarContent({ onSearch, isLoading }) {
 export default function SearchBar({ onSearch, isLoading }) {
   return (
     <Suspense fallback={
-      <div className="relative">
-        <div className="form-control">
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="input input-bordered flex-1"
-              disabled
-            />
-            <div className="btn btn-square">
-              <span className="loading loading-spinner loading-sm"></span>
-            </div>
-          </div>
+      <div className="relative w-full">
+        <div className="flex items-center gap-0 border border-base-300 rounded-lg overflow-hidden bg-base-100">
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="input flex-1 border-0 min-h-[44px] bg-transparent"
+            disabled
+          />
+          <button 
+            className="btn btn-ghost btn-square min-h-[44px] min-w-[44px] border-0"
+            type="button"
+            disabled
+          >
+            <span className="loading loading-spinner loading-sm"></span>
+          </button>
         </div>
       </div>
     }>
