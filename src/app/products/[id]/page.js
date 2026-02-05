@@ -151,7 +151,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-4 lg:gap-8">
         {/* Image Gallery */}
         <div className="space-y-4">
           {/* Main Image */}
@@ -169,7 +169,7 @@ export default function ProductDetailPage() {
             {productImages.length > 1 && (
               <>
                 <button
-                  className="absolute left-2 top-1/2 -translate-y-1/2 btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 btn btn-circle btn-md md:btn-sm bg-black/50 border-none text-white hover:bg-black/70 min-w-[44px] min-h-[44px]"
                   onClick={() => setSelectedImageIndex(
                     selectedImageIndex === 0 ? productImages.length - 1 : selectedImageIndex - 1
                   )}
@@ -177,7 +177,7 @@ export default function ProductDetailPage() {
                   ❮
                 </button>
                 <button
-                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-circle btn-md md:btn-sm bg-black/50 border-none text-white hover:bg-black/70 min-w-[44px] min-h-[44px]"
                   onClick={() => setSelectedImageIndex(
                     selectedImageIndex === productImages.length - 1 ? 0 : selectedImageIndex + 1
                   )}
@@ -199,12 +199,13 @@ export default function ProductDetailPage() {
               {productImages.map((image, index) => (
                 <button
                   key={index}
-                  className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                  className={`relative flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
                     selectedImageIndex === index 
                       ? 'border-primary' 
                       : 'border-transparent hover:border-base-300'
                   }`}
                   onClick={() => setSelectedImageIndex(index)}
+                  style={{ minWidth: '72px', minHeight: '72px', width: '72px', height: '72px' }}
                 >
                   <Image
                     src={image.url}
@@ -222,8 +223,8 @@ export default function ProductDetailPage() {
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            <p className="text-primary text-2xl font-semibold mt-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">{product.name}</h1>
+            <p className="text-primary text-lg sm:text-xl md:text-2xl font-semibold mt-2">
               ${product.price}
             </p>
           </div>
@@ -247,20 +248,20 @@ export default function ProductDetailPage() {
           {/* Quantity and Add to Cart */}
           {product.stock > 0 && (
             <div className="space-y-4">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col lg:flex-row items-center lg:items-center gap-4">
                 <span className="font-semibold">Quantity:</span>
                 <div className="flex items-center gap-2">
                   <button 
-                    className="btn btn-outline btn-sm btn-circle"
+                    className="btn btn-outline btn-circle min-w-[48px] min-h-[48px]"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   >
                     -
                   </button>
-                  <span className="px-4 py-2 bg-base-200 rounded text-center min-w-12">
+                  <span className="px-4 py-2 bg-base-200 rounded text-center min-w-16">
                     {quantity}
                   </span>
                   <button 
-                    className="btn btn-outline btn-sm btn-circle"
+                    className="btn btn-outline btn-circle min-w-[48px] min-h-[48px]"
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                   >
                     +
@@ -268,14 +269,14 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex justify-center lg:justify-start gap-2 items-center">
                 <button 
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary btn-sm lg:btn-md flex-1 min-h-[48px]"
                   onClick={handleAddToCart}
                 >
                   Add to Cart
                 </button>
-                <AddToWishlistButton productId={product._id} className="btn-lg" />
+                <AddToWishlistButton productId={product._id} className="btn btn-sm lg:btn-md btn-square min-w-[48px] min-h-[48px]" />
               </div>
             </div>
           )}
@@ -290,7 +291,7 @@ export default function ProductDetailPage() {
 
       {/* Reviews Section */}
       <div className="mt-12 max-w-4xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center lg:text-left">Customer Reviews</h2>
         
         {/* Review Form - Conditional rendering based on user status */}
         <div className="mb-8">
@@ -311,11 +312,11 @@ export default function ProductDetailPage() {
                 <p className="text-base-content/70">
                   You must be logged in to write a review for this product.
                 </p>
-                <div className="card-actions">
-                  <Link href="/auth/login" className="btn btn-primary">
+                <div className="card-actions flex-col sm:flex-row">
+                  <Link href="/auth/login" className="btn btn-primary w-full sm:w-auto min-h-[48px]">
                     Login
                   </Link>
-                  <Link href="/auth/register" className="btn btn-outline">
+                  <Link href="/auth/register" className="btn btn-outline w-full sm:w-auto min-h-[48px]">
                     Create Account
                   </Link>
                 </div>

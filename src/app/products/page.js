@@ -89,25 +89,22 @@ export default function ProductsPage() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar Filters */}
-        <div className="lg:w-1/4">
-          <ProductFilters onFilterChange={handleFilterChange} isLoading={loading} />
-        </div>
-
-        {/* Main Content */}
-        <div className="lg:w-3/4 space-y-6">
+        {/* Main Content - Shows FIRST on mobile */}
+        <div className="lg:w-3/4 space-y-6 order-2 lg:order-2">
           {/* Header with Search and View Toggle */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
-            <div className="flex items-center gap-4">
-              <Suspense fallback={
-                <div className="input input-bordered w-64 h-12 animate-pulse bg-base-200"></div>
-              }>
-                <SearchBar onSearch={handleSearch} isLoading={loading} />
-              </Suspense>
-              <div className="join">
+          <div className="space-y-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-center sm:text-left">Our Products</h1>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="flex-1">
+                <Suspense fallback={
+                  <div className="input input-bordered w-full h-12 animate-pulse bg-base-200"></div>
+                }>
+                  <SearchBar onSearch={handleSearch} isLoading={loading} />
+                </Suspense>
+              </div>
+              <div className="join self-center sm:self-auto">
                 <button 
-                  className={`btn join-item btn-sm ${viewType === 'grid' ? 'btn-active' : ''}`}
+                  className={`btn join-item min-h-[44px] min-w-[64px] ${viewType === 'grid' ? 'btn-active' : ''}`}
                   onClick={() => setViewType('grid')}
                   aria-label="Grid view"
                   disabled={loading}
@@ -115,7 +112,7 @@ export default function ProductsPage() {
                   Grid
                 </button>
                 <button 
-                  className={`btn join-item btn-sm ${viewType === 'list' ? 'btn-active' : ''}`}
+                  className={`btn join-item min-h-[44px] min-w-[64px] ${viewType === 'list' ? 'btn-active' : ''}`}
                   onClick={() => setViewType('list')}
                   aria-label="List view"
                   disabled={loading}
@@ -191,6 +188,24 @@ export default function ProductsPage() {
               )}
             </>
           )}
+        </div>
+
+        {/* Sidebar Filters - Shows AFTER products on mobile, before on desktop */}
+        <div className="lg:w-1/4 order-1 lg:order-1">
+          <div className="collapse lg:collapse-open collapse-arrow bg-base-100 lg:bg-transparent border lg:border-0 border-base-300 rounded-lg lg:rounded-none">
+            <input type="checkbox" defaultChecked={false} className="lg:hidden" />
+            <div className="collapse-title text-lg font-medium lg:hidden min-h-[56px] flex items-center">
+              <span className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                </svg>
+                Filters & Sort
+              </span>
+            </div>
+            <div className="collapse-content lg:p-0 px-4 pb-4">
+              <ProductFilters onFilterChange={handleFilterChange} isLoading={loading} isMobileCollapse={true} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

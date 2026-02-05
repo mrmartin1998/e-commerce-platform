@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-function ProductFiltersContent({ onFilterChange, isLoading }) {
+function ProductFiltersContent({ onFilterChange, isLoading, isMobileCollapse = false }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState({
@@ -107,12 +107,12 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
   };
 
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">Filters</h2>
+    <div className={isMobileCollapse ? "space-y-4 w-full" : "card bg-base-100 shadow-xl"}>
+      <div className={isMobileCollapse ? "space-y-4 w-full" : "card-body"}>
+        {!isMobileCollapse && <h2 className="card-title">Filters</h2>}
         
         {/* Category Filter */}
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Category</span>
           </label>
@@ -120,7 +120,7 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
             <div className="skeleton h-12 w-full"></div>
           ) : (
             <select 
-              className="select select-bordered"
+              className="select select-bordered min-h-[48px] w-full"
               value={filters.category}
               onChange={(e) => handleFilterChange({ category: e.target.value })}
               disabled={isLoading}
@@ -138,15 +138,15 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
         </div>
 
         {/* Price Range */}
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Price Range</span>
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full">
             <input
               type="number"
               placeholder="Min"
-              className="input input-bordered input-sm flex-1"
+              className="input input-bordered min-h-[44px] flex-1 w-0"
               value={filters.minPrice}
               onChange={(e) => handleFilterChange({ minPrice: e.target.value })}
               disabled={isLoading}
@@ -154,7 +154,7 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
             <input
               type="number"
               placeholder="Max"
-              className="input input-bordered input-sm flex-1"
+              className="input input-bordered min-h-[44px] flex-1 w-0"
               value={filters.maxPrice}
               onChange={(e) => handleFilterChange({ maxPrice: e.target.value })}
               disabled={isLoading}
@@ -163,12 +163,12 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
         </div>
 
         {/* Sort Options */}
-        <div className="form-control">
+        <div className="form-control w-full">
           <label className="label">
             <span className="label-text">Sort By</span>
           </label>
           <select 
-            className="select select-bordered"
+            className="select select-bordered min-h-[48px] w-full"
             value={`${filters.sortBy}-${filters.sortOrder}`}
             onChange={(e) => {
               const [sortBy, sortOrder] = e.target.value.split('-');
@@ -187,7 +187,7 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
 
         {/* Clear Filters */}
         <button 
-          className="btn btn-ghost btn-sm mt-4"
+          className="btn btn-ghost btn-sm md:btn-md mt-4 min-h-[44px] w-full"
           onClick={() => handleFilterChange({
             category: '',
             minPrice: '',
@@ -204,11 +204,11 @@ function ProductFiltersContent({ onFilterChange, isLoading }) {
   );
 }
 
-export default function ProductFilters({ onFilterChange, isLoading }) {
+export default function ProductFilters({ onFilterChange, isLoading, isMobileCollapse = false }) {
   return (
     <Suspense fallback={
-      <div className="card bg-base-100 shadow-xl">
-        <div className="card-body">
+      <div className={isMobileCollapse ? "space-y-4" : "card bg-base-100 shadow-xl"}>
+        <div className={isMobileCollapse ? "space-y-4" : "card-body"}>
           <div className="skeleton h-8 w-24 mb-4"></div>
           <div className="skeleton h-12 w-full mb-4"></div>
           <div className="skeleton h-12 w-full mb-4"></div>
@@ -216,7 +216,7 @@ export default function ProductFilters({ onFilterChange, isLoading }) {
         </div>
       </div>
     }>
-      <ProductFiltersContent onFilterChange={onFilterChange} isLoading={isLoading} />
+      <ProductFiltersContent onFilterChange={onFilterChange} isLoading={isLoading} isMobileCollapse={isMobileCollapse} />
     </Suspense>
   );
 }
