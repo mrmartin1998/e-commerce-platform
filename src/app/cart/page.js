@@ -56,7 +56,7 @@ export default function CartPage() {
         <p className="text-base-content/70 mb-8">
           Looks like you haven't added anything to your cart yet.
         </p>
-        <Link href="/products" className="btn btn-primary">
+        <Link href="/products" className="btn btn-primary min-h-[48px]">
           Continue Shopping
         </Link>
       </div>
@@ -64,14 +64,14 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 pb-24 md:pb-8">
       <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
       
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2">
           <div className="bg-base-100 rounded-lg shadow-lg">
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               <h2 className="text-xl font-semibold mb-4">
                 Items ({items.length})
               </h2>
@@ -91,7 +91,7 @@ export default function CartPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-base-100 rounded-lg shadow-lg p-6 sticky top-4">
+          <div className="bg-base-100 rounded-lg shadow-lg p-6 md:sticky md:top-4">
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             
             <div className="space-y-3">
@@ -110,16 +110,20 @@ export default function CartPage() {
               </div>
             </div>
             
-            <Link 
-              href="/checkout" 
-              className="btn btn-primary w-full mt-6"
-            >
-              Proceed to Checkout
-            </Link>
+            <div className="fixed bottom-0 left-0 right-0 bg-base-100 p-4 md:relative md:p-0 z-40 shadow-lg md:shadow-none">
+              <div className="container mx-auto max-w-md">
+                <Link 
+                  href="/checkout" 
+                  className="btn btn-primary w-full min-h-[48px]"
+                >
+                  Proceed to Checkout
+                </Link>
+              </div>
+            </div>
             
             <Link 
               href="/products" 
-              className="btn btn-ghost w-full mt-2"
+              className="btn btn-ghost w-full mt-2 min-h-[48px] mb-20 md:mb-0"
             >
               Continue Shopping
             </Link>

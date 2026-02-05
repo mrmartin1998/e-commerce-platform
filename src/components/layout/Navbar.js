@@ -11,9 +11,14 @@ export default function Navbar() {
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { items } = useCart();
 
   const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -72,7 +77,7 @@ export default function Navbar() {
           <div 
             tabIndex={0}
             role="button" 
-            className="btn btn-ghost lg:hidden mobile-menu-button"
+            className="btn btn-ghost lg:hidden mobile-menu-button min-w-[44px] min-h-[44px]"
             onClick={toggleMobileMenu}
             aria-expanded={isMobileMenuOpen}
           >
@@ -82,13 +87,22 @@ export default function Navbar() {
           </div>
           <ul 
             tabIndex={0} 
-            className={`menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+            className={`menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-64 ${isMobileMenuOpen ? 'block' : 'hidden'}`}
           >
             <li><Link href="/products" onClick={toggleMobileMenu}>Products</Link></li>
             {/* 
             <li><Link href="/categories" onClick={toggleMobileMenu}>Categories</Link></li>
             */}
-            <li><Link href="/cart" onClick={toggleMobileMenu}>Cart</Link></li>
+            <li>
+              <Link href="/cart" onClick={toggleMobileMenu} className="indicator">
+                Cart
+                {isMounted && cartItemCount > 0 && (
+                  <span className="badge badge-sm badge-primary indicator-item">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </li>
             <li><Link href="/wishlist" onClick={toggleMobileMenu}>Wishlist</Link></li>
           </ul>
         </div>
@@ -104,7 +118,7 @@ export default function Navbar() {
           <li>
             <Link href="/cart" className="indicator">
               Cart
-              {cartItemCount > 0 && (
+              {isMounted && cartItemCount > 0 && (
                 <span className="badge badge-sm badge-primary indicator-item">
                   {cartItemCount}
                 </span>
@@ -124,7 +138,7 @@ export default function Navbar() {
             <div 
               tabIndex={0}
               role="button" 
-              className="btn btn-ghost btn-circle avatar profile-menu-button"
+              className="btn btn-ghost btn-circle avatar profile-menu-button min-w-[44px] min-h-[44px]"
               onClick={toggleProfileMenu}
               aria-expanded={isProfileMenuOpen}
             >
@@ -136,7 +150,7 @@ export default function Navbar() {
             </div>
             <ul 
               tabIndex={0} 
-              className={`mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52 ${isProfileMenuOpen ? 'block' : 'hidden'}`}
+              className={`mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-64 max-h-[80vh] overflow-y-auto ${isProfileMenuOpen ? 'block' : 'hidden'}`}
             >
               {/* User Info Section */}
               <li className="menu-title">

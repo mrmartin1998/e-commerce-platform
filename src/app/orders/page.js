@@ -341,47 +341,96 @@ export default function OrdersPage() {
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td>{order._id}</td>
-                  <td>{order.items?.length} items</td>
-                  <td>${order.total?.toFixed(2)}</td>
-                  <td>
+        <>
+          {/* Mobile: Cards */}
+          <div className="block md:hidden space-y-4">
+            {orders.map((order) => (
+              <div key={order._id} className="card bg-base-100 shadow-xl">
+                <div className="card-body p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      <p className="text-xs text-base-content/60">Order ID</p>
+                      <p className="font-mono text-sm truncate">{order._id}</p>
+                    </div>
                     <span className={`badge ${
                       order.status === 'delivered' ? 'badge-success' : 
+                      order.status === 'shipped' ? 'badge-info' :
                       order.status === 'pending' ? 'badge-warning' : 
-                      'badge-info'
+                      'badge-primary'
                     }`}>
                       {order.status}
                     </span>
-                  </td>
-                  <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <button 
-                      onClick={() => viewOrderDetails(order._id)}
-                      className="btn btn-sm btn-outline"
-                    >
-                      View Details
-                    </button>
-                  </td>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-xs text-base-content/60">Total</p>
+                      <p className="font-semibold">${order.total?.toFixed(2)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-base-content/60">Items</p>
+                      <p>{order.items?.length} items</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-xs text-base-content/60">Date</p>
+                      <p>{new Date(order.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={() => viewOrderDetails(order._id)}
+                    className="btn btn-primary btn-sm w-full mt-2 min-h-[44px]"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order._id}>
+                    <td>{order._id}</td>
+                    <td>{order.items?.length} items</td>
+                    <td>${order.total?.toFixed(2)}</td>
+                    <td>
+                      <span className={`badge ${
+                        order.status === 'delivered' ? 'badge-success' : 
+                        order.status === 'pending' ? 'badge-warning' : 
+                        'badge-info'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      <button 
+                        onClick={() => viewOrderDetails(order._id)}
+                        className="btn btn-sm btn-outline"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {pagination && pagination.total > 1 && (

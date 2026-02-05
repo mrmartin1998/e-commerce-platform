@@ -66,20 +66,18 @@ export default function RecentlyViewed({
         {showClearButton && products.length > 0 && (
           <button 
             onClick={handleClearHistory}
-            className="btn btn-sm btn-ghost"
+            className="btn btn-sm md:btn-md btn-ghost min-h-[44px]"
           >
             Clear History
           </button>
         )}
       </div>
 
-      {/* Product Grid - Horizontal Scroll on Mobile, Grid on Desktop */}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-6">
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
+      {/* Product Grid - 2 Columns on Mobile, More on Desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+        {products.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
       </div>
     </div>
   );
@@ -93,7 +91,7 @@ function ProductCard({ product }) {
   return (
     <Link 
       href={`/products/${product._id}`}
-      className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow min-w-[200px] md:min-w-0 group"
+      className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow group"
     >
       <figure className="relative h-48 overflow-hidden">
         <Image

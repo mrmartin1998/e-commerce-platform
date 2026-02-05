@@ -3,7 +3,7 @@
 export default function ThemeSwitcher() {
   return (
     <select 
-      className="select select-bordered select-sm" 
+      className="select select-bordered select-sm md:select-md min-h-[44px]" 
       data-choose-theme 
       onChange={(e) => {
         const theme = e.target.value;
