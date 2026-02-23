@@ -75,7 +75,7 @@ export default function CartDropdown({ isOpen, onClose }) {
                   <p className="text-sm">${item.price}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <button 
-                      className="btn btn-xs min-w-[36px] min-h-[36px]"
+                      className="btn btn-xs min-w-[44px] min-h-[44px]"
                       onClick={async () => {
                         try {
                           await updateQuantity(item.productId, item.quantity - 1);

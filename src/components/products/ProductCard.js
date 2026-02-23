@@ -49,7 +49,7 @@ export default function ProductCard({ product }) {
             {/* Image Navigation Buttons - only show on hover */}
             <div className="absolute inset-0 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
               <button
-                className="btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70 ml-2"
+                className="btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70 ml-2 min-w-[44px] min-h-[44px]"
                 onClick={(e) => {
                   e.preventDefault();
                   prevImage();
@@ -58,7 +58,7 @@ export default function ProductCard({ product }) {
                 ❮
               </button>
               <button
-                className="btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70 mr-2"
+                className="btn btn-circle btn-sm bg-black/50 border-none text-white hover:bg-black/70 mr-2 min-w-[44px] min-h-[44px]"
                 onClick={(e) => {
                   e.preventDefault();
                   nextImage();

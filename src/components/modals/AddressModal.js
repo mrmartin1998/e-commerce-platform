@@ -81,7 +81,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label">
                 <span className="label-text">City</span>
@@ -114,7 +114,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label">
                 <span className="label-text">Country</span>

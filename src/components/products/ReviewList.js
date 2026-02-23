@@ -311,7 +311,7 @@ export default function ReviewList({
           
           {/* Previous Button */}
           <button
-            className="btn btn-sm"
+            className="btn btn-sm md:btn-md min-h-[44px]"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
@@ -323,7 +323,7 @@ export default function ReviewList({
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
-                className={`btn btn-sm ${page === currentPage ? 'btn-primary' : 'btn-ghost'}`}
+                className={`btn btn-sm md:btn-md min-h-[44px] ${page === currentPage ? 'btn-primary' : 'btn-ghost'}`}
                 onClick={() => handlePageChange(page)}
               >
                 {page}
@@ -333,7 +333,7 @@ export default function ReviewList({
 
           {/* Next Button */}
           <button
-            className="btn btn-sm"
+            className="btn btn-sm md:btn-md min-h-[44px]"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >

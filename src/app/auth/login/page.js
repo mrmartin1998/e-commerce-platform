@@ -51,8 +51,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-      <div className="card w-96 bg-base-100 shadow-xl">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+      <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center text-2xl font-bold mb-4">Sign In</h2>
           
