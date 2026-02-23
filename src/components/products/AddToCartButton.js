@@ -22,20 +22,20 @@ export default function AddToCartButton({ productId }) {
     <div className="flex items-center gap-4">
       <div className="join">
         <button 
-          className="btn btn-sm join-item"
+          className="btn btn-sm md:btn-md join-item min-w-[44px] min-h-[44px]"
           onClick={() => setQuantity(Math.max(1, quantity - 1))}
         >
           -
         </button>
         <input 
           type="number" 
-          className="input input-bordered input-sm w-20 join-item text-center"
+          className="input input-bordered input-sm md:input-md w-20 join-item text-center"
           value={quantity}
           onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
           min="1"
         />
         <button 
-          className="btn btn-sm join-item"
+          className="btn btn-sm md:btn-md join-item min-w-[44px] min-h-[44px]"
           onClick={() => setQuantity(quantity + 1)}
         >
           +
